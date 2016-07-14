@@ -50,8 +50,8 @@ function Ray:Ray(...)
 	end
 end
 
-function Ray:boxIntersect(box, transformMatrix, near, far)
-	local retVal = Polycode.Ray_boxIntersect(self.__ptr, box.__ptr, transformMatrix.__ptr, near, far)
+function Ray:boxIntersect(box, transformMatrix, vnear, vfar)
+	local retVal = Polycode.Ray_boxIntersect(self.__ptr, box.__ptr, transformMatrix.__ptr, vnear, vfar)
 	return retVal
 end
 
@@ -77,11 +77,6 @@ function Ray:closestPointOnRay(point)
 	local __c = _G["Vector3"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
-end
-
-function Ray:closestPointsBetween(ray2, point1, point2)
-	local retVal = Polycode.Ray_closestPointsBetween(self.__ptr, ray2.__ptr, point1.__ptr, point2.__ptr)
-	return retVal
 end
 
 function Ray:polygonIntersect(v1, v2, v3)

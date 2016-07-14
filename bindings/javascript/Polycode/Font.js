@@ -1,8 +1,17 @@
-function Font() {
+require('Polycode/Resource')
+
+function Font(fileName,FTLibrary) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.Font(fileName,FTLibrary)
+	}
 	Object.defineProperties(this, {
 		'loaded': { enumerable: true, configurable: true, get: Font.prototype.__get_loaded, set: Font.prototype.__set_loaded}
 	})
 }
+
+
+Font.prototype = Object.create(Resource.prototype)
+
 Font.prototype.__get_loaded = function() {
 	return Polycode.Font__get_loaded(this.__ptr)
 }
@@ -19,7 +28,7 @@ Duktape.fin(Font.prototype, function (x) {
 })
 
 Font.prototype.getFace = function() {
-	var retVal = new FT_Face()
+	var retVal = new FT_Face("__skip_ptr__")
 	retVal.__ptr = Polycode.Font_getFace(this.__ptr)
 	return retVal
 }

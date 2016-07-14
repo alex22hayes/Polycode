@@ -33,22 +33,22 @@ Bone::Bone(const String& boneName) : Entity() {
 	this->boneName = boneName;
 	parentBone = NULL;
 	boneMatrix.identity();
-    disableAnimation = false;
+	disableAnimation = false;
 }
 
 Bone::~Bone() {
 
 }
 
-void Bone::setParentBone(Bone *bone) {
+void Bone::setParentBone(std::shared_ptr<Bone> bone) {
 	parentBone = bone;
 }
 
-void Bone::addChildBone(Bone *bone) {
+void Bone::addChildBone(std::shared_ptr<Bone> bone) {
 	childBones.push_back(bone);
 }
 
-Bone* Bone::getParentBone() {
+std::shared_ptr<Bone> Bone::getParentBone() {
 	return parentBone;
 }
 
@@ -56,7 +56,7 @@ int Bone::getNumChildBones() {
 	return childBones.size();
 }
 
-Bone *Bone::getChildBone(unsigned int index) {
+std::shared_ptr<Bone> Bone::getChildBone(unsigned int index) {
 	if(index > childBones.size()-1)
 		index = childBones.size()-1;
 		
@@ -72,47 +72,47 @@ Matrix4 Bone::getBoneMatrix() const {
 }
 
 void Bone::intializeBone(const Vector3 &basePosition, const Vector3 &baseScale, const Quaternion &baseRotation, const Vector3 &restPosition, const Vector3 &restScale, const Quaternion &restRotation) {
-    
-    this->baseRotation = baseRotation;
-    this->baseScale = baseScale;
-    this->basePosition = basePosition;
-    
-    setPosition(basePosition);
-    setRotationByQuaternion(baseRotation);
-    setScale(baseScale);
-    rebuildTransformMatrix();
-    
-    setBaseMatrix(getTransformMatrix());
-    setBoneMatrix(getTransformMatrix());
-    
-    Matrix4 restRotationMatrix = restRotation.createMatrix();
+	
+	this->baseRotation = baseRotation;
+	this->baseScale = baseScale;
+	this->basePosition = basePosition;
+	
+	setPosition(basePosition);
+	setRotationByQuaternion(baseRotation);
+	setScale(baseScale);
+	rebuildTransformMatrix();
+	
+	setBaseMatrix(getTransformMatrix());
+	setBoneMatrix(getTransformMatrix());
+	
+	Matrix4 restRotationMatrix = restRotation.createMatrix();
 
-    Matrix4 restPositionMatrix;
-    restPositionMatrix.identity();
-    restPositionMatrix.setPosition(restPosition.x, restPosition.y, restPosition.z);
+	Matrix4 restPositionMatrix;
+	restPositionMatrix.identity();
+	restPositionMatrix.setPosition(restPosition.x, restPosition.y, restPosition.z);
 
-    Matrix4 restScaleMatrix;
-    restScaleMatrix.identity();
-    restScaleMatrix.setScale(restScale);
-    
-    
-    setRestMatrix(restScaleMatrix*restRotationMatrix*restPositionMatrix);
+	Matrix4 restScaleMatrix;
+	restScaleMatrix.identity();
+	restScaleMatrix.setScale(restScale);
+	
+	
+	setRestMatrix(restScaleMatrix*restRotationMatrix*restPositionMatrix);
 }
 
 Matrix4 Bone::getFinalMatrix() const {
-    return finalMatrix;
+	return finalMatrix;
 }
 
 Matrix4 Bone::buildFinalMatrix() const {
-    if(parentBone) {
-        return boneMatrix * parentBone->buildFinalMatrix();
-    } else {
-        return boneMatrix;
-    }
+	if(parentBone) {
+		return boneMatrix * parentBone->buildFinalMatrix();
+	} else {
+		return boneMatrix;
+	}
 }
 
 void Bone::rebuildFinalMatrix() {
-    finalMatrix = restMatrix * buildFinalMatrix();
+	finalMatrix = restMatrix * buildFinalMatrix();
 }
 
 void Bone::setBoneMatrix(const Matrix4& matrix) {

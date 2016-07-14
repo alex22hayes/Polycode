@@ -1,9 +1,28 @@
-function Resource() {
+require('Polycode/EventDispatcher')
+
+function Resource(type) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.Resource(type)
+	}
 	Object.defineProperties(this, {
 		'reloadOnFileModify': { enumerable: true, configurable: true, get: Resource.prototype.__get_reloadOnFileModify, set: Resource.prototype.__set_reloadOnFileModify},
 		'resourceFileTime': { enumerable: true, configurable: true, get: Resource.prototype.__get_resourceFileTime, set: Resource.prototype.__set_resourceFileTime}
 	})
 }
+
+Resource.RESOURCE_TEXTURE = 0
+Resource.RESOURCE_MATERIAL = 1
+Resource.RESOURCE_SHADER = 2
+Resource.RESOURCE_PROGRAM = 3
+Resource.RESOURCE_MESH = 5
+Resource.RESOURCE_CUBEMAP = 6
+Resource.RESOURCE_SPRITE = 7
+Resource.RESOURCE_ENTITY_INSTANCE = 8
+Resource.RESOURCE_FONT = 9
+Resource.RESOURCE_SCRIPT = 10
+
+Resource.prototype = Object.create(EventDispatcher.prototype)
+
 Resource.prototype.__get_reloadOnFileModify = function() {
 	return Polycode.Resource__get_reloadOnFileModify(this.__ptr)
 }
@@ -13,7 +32,7 @@ Resource.prototype.__set_reloadOnFileModify = function(val) {
 }
 
 Resource.prototype.__get_resourceFileTime = function() {
-	var retVal = new time_t()
+	var retVal = new size_t("__skip_ptr__")
 	retVal.__ptr = 	Polycode.Resource__get_resourceFileTime(this.__ptr)
 	return retVal
 }

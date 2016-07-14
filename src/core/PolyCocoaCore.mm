@@ -135,8 +135,9 @@ CocoaCore::CocoaCore(PolycodeView *view, int _xRes, int _yRes, bool fullScreen, 
     renderer->setGraphicsInterface(this, interface);
     services->setRenderer(renderer);
     setVideoMode(xRes, yRes, fullScreen, vSync, aaLevel, anisotropyLevel, retinaSupport);
-    
-    services->getSoundManager()->setAudioInterface(new PAAudioInterface());
+	
+	audioInterface = new PAAudioInterface();
+    services->getSoundManager()->setAudioInterface(audioInterface);
 }
 
 void CocoaCore::setVideoMode(int xRes, int yRes, bool fullScreen, bool vSync, int aaLevel, int anisotropyLevel, bool retinaSupport) {
@@ -332,6 +333,7 @@ String CocoaCore::executeExternalCommand(String command,  String args, String in
 
 CocoaCore::~CocoaCore() {
 	printf("Shutting down cocoa core\n");
+	delete renderer;
 	[glView setCore:nil];	
 	shutdownGamepad();
 	if(fullScreen) {
@@ -494,10 +496,10 @@ void CocoaCore::checkEvents() {
 						break;
 					case InputEvent::EVENT_KEYDOWN:
 						if(!checkSpecialKeyEvents(event.keyCode))
-							input->setKeyState(event.keyCode, event.unicodeChar, true, getTicks());
+							input->setKeyState(event.keyCode, true, getTicks());
 						break;
 					case InputEvent::EVENT_KEYUP:
-						input->setKeyState(event.keyCode, event.unicodeChar, false, getTicks());
+						input->setKeyState(event.keyCode, false, getTicks());
                     break;
                     case InputEvent::EVENT_TOUCHES_BEGAN:
                         input->touchesBegan(event.touch, event.touches, getTicks());
@@ -508,6 +510,9 @@ void CocoaCore::checkEvents() {
                     case InputEvent::EVENT_TOUCHES_MOVED:
                         input->touchesMoved(event.touch, event.touches, getTicks());
                     break;
+					case InputEvent::EVENT_TEXTINPUT:
+						input->textInput(event.text);
+					break;
 				}
 				break;
 				case CocoaEvent::FOCUS_EVENT:
@@ -634,12 +639,6 @@ vector<String> CocoaCore::openFilePicker(vector<CoreFileExtension> extensions, b
 	}
 	
 	return retVector;
-}
-
-void CocoaCore::Render() {
-    renderer->beginFrame();
-    services->Render(Polycode::Rectangle(0, 0, getBackingXRes(), getBackingYRes()));
-    renderer->endFrame();
 }
 
 void CocoaCore::flushRenderContext() {

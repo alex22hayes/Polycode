@@ -31,30 +31,44 @@
 
 using namespace Polycode;
 
+
 ShaderPass::ShaderPass() :
-    shader(NULL),
-    wireframe(false),
-    shaderBinding(NULL),
-    materialShaderBinding(NULL),
-    blendingMode(Renderer::BLEND_MODE_NONE)
-{
-    
+	shader(NULL),
+	wireframe(false),
+	shaderBinding(NULL),
+	materialShaderBinding(NULL),
+	blendingMode(Renderer::BLEND_MODE_NONE) {
+
 }
 
 ShaderPass::ShaderPass(Shader *shader) :
-    shader(shader),
-    wireframe(false),
-    shaderBinding(NULL),
-    materialShaderBinding(NULL),
-    blendingMode(Renderer::BLEND_MODE_NONE)
-{
-    
+	shader(shader),
+	wireframe(false),
+	shaderBinding(NULL),
+	materialShaderBinding(NULL),
+	blendingMode(Renderer::BLEND_MODE_NONE) {
+
 }
+
+ShaderPass::ShaderPass(const ShaderPass &other) {
+	shader = other.shader;
+	wireframe = other.wireframe;
+	blendingMode = other.blendingMode;
+	shaderBinding = other.shaderBinding;
+	materialShaderBinding = other.materialShaderBinding;
+}
+
+ShaderPass::~ShaderPass() {
+}
+
+std::shared_ptr<ShaderBinding> ShaderPass::getShaderBinding() {
+	return shaderBinding;
+}
+
 
 Material::Material(const String& name) : Resource(Resource::RESOURCE_MATERIAL) {
 	this->name = name;
 	fp16RenderTargets = false;
-	shaderModule = NULL;
 	blendingMode = Renderer::BLEND_MODE_NORMAL;
 	screenMaterial = false;
 }
@@ -68,27 +82,17 @@ Material::~Material() {
 
 void Material::setName(const String &name) {
 	this->name = name;
-    setResourceName(name);
+	setResourceName(name);
 	dispatchEvent(new Event(), Event::RESOURCE_CHANGE_EVENT);
 }
 
 void Material::clearShaders() {
-    
-    // SMARTPTR_TODO: add here
-	// do not delete shaders here, they're shared
-/*	
-	for(int i=0; i < materialShaders.size(); i++)	{
-		delete materialShaders[i];
-	}
-	*/
-	
 	for(int i=0; i < shaderPasses.size(); i++)	{
 		shaderPasses[i].shader->removeAllHandlersForListener(this);
-        Services()->getRenderer()->destroyShaderBinding(shaderPasses[i].shaderBinding);
 	}	
 	shaderPasses.clear();
 	
-	for(int i=0; i < renderTargets.size(); i++)	{
+	for(int i=0; i < renderTargets.size(); i++) {
 		delete renderTargets[i];
 	}
 	renderTargets.clear();		
@@ -101,11 +105,9 @@ void Material::recreateRenderTargets() {
 }
 
 void Material::recreateRenderTarget(ShaderRenderTarget *renderTarget) {
-    
-
 	int textureWidth;
 	int textureHeight;
-	RenderBuffer *newBuffer;
+	std::shared_ptr<RenderBuffer> newBuffer;
 	
 	if(renderTarget->sizeMode == ShaderRenderTarget::SIZE_MODE_NORMALIZED) {
 		Number safeWidth = renderTarget->width;
@@ -131,14 +133,14 @@ void Material::recreateRenderTarget(ShaderRenderTarget *renderTarget) {
 		textureWidth = (int)renderTarget->width;
 		textureHeight = (int)renderTarget->height;		
 	}
-    
-    newBuffer = Services()->getRenderer()->createRenderBuffer(textureWidth, textureHeight, false, fp16RenderTargets);
+	
+	newBuffer = std::make_shared<RenderBuffer>(textureWidth, textureHeight, false, fp16RenderTargets);
 //	newBuffer->setResourceName(renderTarget->id);
 	
-	RenderBuffer *oldBuffer = renderTarget->buffer;
+	std::shared_ptr<RenderBuffer> oldBuffer = renderTarget->buffer;
 	renderTarget->buffer = newBuffer;
 
-    /*
+	/*
 	if(oldBuffer) {
 		for(int i=0; i < shaderBindings.size(); i++) {
 			for(int j=0; j < shaderBindings[i]->getNumRenderTargetBindings(); j++) {
@@ -155,64 +157,21 @@ void Material::recreateRenderTarget(ShaderRenderTarget *renderTarget) {
 */
 }
 
-void Material::handleEvent(Event *event) {
-//    recreateExpectedShaderParams();
-}
-
-void Material::recreateExpectedShaderParams() {
-    return;
-    for (int i = 0; i < shaderPasses.size(); i++) {
-        
-        Shader* shader = shaderPasses[i].shader;
-        ShaderBinding* shaderBinding = shaderPasses[i].shaderBinding;
-        
-        for(int i=0; i < shader->expectedParams.size(); i++) {
-            if(!shaderBinding->getLocalParamByName(shader->expectedParams[i].name)) {
-                if(!shader->expectedParams[i].globalParam) {
-                    shaderBinding->addParam(shader->expectedParams[i].type, shader->expectedParams[i].name);
-                }
-            }
-        }
-    }
-    dispatchEvent(new Event(), Event::RESOURCE_RELOAD_EVENT);
-}
-
 void Material::removeShaderPass(int shaderIndex) {
 	if(shaderIndex >= 0 && shaderIndex < shaderPasses.size()) {
-        Services()->getRenderer()->destroyShaderBinding(shaderPasses[shaderIndex].shaderBinding);
 		shaderPasses.erase(shaderPasses.begin() + shaderIndex);
 	}
 }
 
-void Material::addShaderAtIndex(Shader *shader,ShaderBinding *shaderBinding, int shaderIndex) {
-    ShaderPass newPass;
-    newPass.shader = shader;
-    newPass.shaderBinding = shaderBinding;
-    shaderBinding->targetShader = shader;
-	shaderPasses.insert(shaderPasses.begin()+shaderIndex, newPass);
-	shader->addEventListener(this, Event::RESOURCE_RELOAD_EVENT);
-}
-
 void Material::addShaderPass(const ShaderPass &pass) {
-    shaderPasses.push_back(pass);
-    pass.shader->addEventListener(this, Event::RESOURCE_RELOAD_EVENT);
-    recreateExpectedShaderParams();
+	shaderPasses.push_back(pass);
+	pass.shader->addEventListener(this, Event::RESOURCE_RELOAD_EVENT);
 }
 
 void Material::addShaderPassAtIndex(const ShaderPass &pass, unsigned int shaderIndex) {
-    shaderPasses.insert(shaderPasses.begin()+shaderIndex, pass);
-    pass.shader->addEventListener(this, Event::RESOURCE_RELOAD_EVENT);
+	shaderPasses.insert(shaderPasses.begin()+shaderIndex, pass);
+	pass.shader->addEventListener(this, Event::RESOURCE_RELOAD_EVENT);
 }
-
-
-void Material::addShader(Shader *shader,ShaderBinding *shaderBinding) {
-    ShaderPass newPass;
-    newPass.shader = shader;
-    newPass.shaderBinding = shaderBinding;
-    shaderBinding->targetShader = shader;
-    addShaderPass(newPass);
-}
-
 
 unsigned int Material::getNumShaderPasses() const {
 	return shaderPasses.size();
@@ -225,20 +184,20 @@ const String& Material::getName() const {
 ShaderPass Material::getShaderPass(unsigned int index) const {
 	if(index < shaderPasses.size()) {
 		return shaderPasses[index];
-    } else {
-        return ShaderPass();
-    }
+	} else {
+		return ShaderPass();
+	}
 }
 
-Shader *Material::getShader(unsigned int index) const {
-    if(index < shaderPasses.size()) {
-        return shaderPasses[index].shader;
-    } else {
-        return NULL;
-    }
+std::shared_ptr<Shader> Material::getShader(unsigned int index) const {
+	if(index < shaderPasses.size()) {
+		return shaderPasses[index].shader;
+	} else {
+		return NULL;
+	}
 }
 
-ShaderBinding *Material::getShaderBinding(unsigned int index) const {
+std::shared_ptr<ShaderBinding> Material::getShaderBinding(unsigned int index) const {
 	if(index < shaderPasses.size()) {
 		return shaderPasses[index].shaderBinding;
 	} else {

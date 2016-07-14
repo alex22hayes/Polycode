@@ -8,7 +8,7 @@ from JSBindingsGenerator import *
 
 class BindingsGenerator(object):
 
-	def __init__(self, engines, configFile):
+	def __init__(self, configFile):
 		self.config = ConfigParser.RawConfigParser(allow_no_value=True)
 		self.config.read(configFile)
 		self.targetDir = self.config.get('global', 'TargetDirectory')
@@ -69,11 +69,23 @@ class BindingsGenerator(object):
 		ty = re.sub(r'^.*\sshort\s*$', 'int', ty)
 		ty = re.sub(r'^.*\sfloat\s*$', 'Number', ty)
 		ty = re.sub(r'^.*\sdouble\s*$', 'Number', ty) # eg "long double"
-		ty = ty.replace("unsigned", "int")
+		ty = ty.replace("unsigned int", "int")
+		ty = ty.replace("unsigned short", "int")
+		ty = ty.replace("unsigned long", "int")
 		ty = ty.replace("long", "int")
 		ty = ty.replace("float", "Number")
 		ty = ty.replace("double", "Number")
 		ty = ty.replace(" ", "") # Not very safe!
+		return ty
+
+	# ----------------------------------------------------
+	# Clean and reduce types to standard identifiers
+	# ----------------------------------------------------
+	def cleanTypeFilter(self, ty):
+		ty = ty.replace("shared_ptr", "")
+		ty = ty.replace("<", "")
+		ty = ty.replace(">", "")
+		ty = ty.replace("*", "")
 		return ty
 
 	# ----------------------------------------------------
@@ -87,6 +99,7 @@ class BindingsGenerator(object):
 			pp["type"] = pp["type"].replace("Polycode::", "")
 			pp["type"] = pp["type"].replace("std::", "")
 			classPP["type"] = self.typeFilter(pp["type"])
+			classPP["cleanType"] = self.cleanTypeFilter(classPP["type"])
 			if pp["type"].find("POLYIGNORE") != -1:
 				continue
 			if pp["name"] == "" or pp["array"] == 1:
@@ -106,11 +119,13 @@ class BindingsGenerator(object):
 					classPP["defaultValue"] = pp["defaltValue"]
 				if 'doxygen' in pp:
 					classPP["doc"] = self.cleanDocs(pp['doxygen'])
-				properties.append(classPP)
+				if classPP["type"].find("*") == -1:
+					properties.append(classPP)
 			else:
 				classPP["isStatic"] = False
 				if pp["type"].find("vector") == -1 and pp["name"] != "setScale" and pp["name"] != "setPosition" and pp["name"] != "BUFFER_CACHE_PRECISION" and not pp["name"].isdigit():
-					properties.append(classPP)
+					if classPP["type"].find("*") == -1: #do not add raw pointer accessors
+						properties.append(classPP)
 		return properties
 
 	# ----------------------------------------------------
@@ -129,12 +144,14 @@ class BindingsGenerator(object):
 				method["isStatic"] = True
 
 			method["type"] = self.typeFilter(pm["rtnType"])
+			method["cleanType"] = self.cleanTypeFilter(method["type"])
 			if pm["name"] in parsedMethods or pm["name"].find("operator") > -1 or pm["rtnType"].find("POLYIGNORE") > -1 or pm["name"] in self.ignoreMethods :
 				continue
 			#ignore destructors
 			if pm["name"] == "~"+c["name"]:
 				continue
 			method["parameters"] = []
+			hasPointerParam = False
 			for param in pm["parameters"]:
 				mParam = {}
 				if not "name" in param:
@@ -145,11 +162,15 @@ class BindingsGenerator(object):
 					continue
 				mParam["name"] = param["name"]
 				mParam["type"] = self.typeFilter(param["type"])
+				mParam["cleanType"] = self.cleanTypeFilter(mParam["type"])
 				if "defaltValue" in param:
 					mParam["defaultValue"] = param["defaltValue"]
 				method["parameters"].append(mParam)
+				if mParam["type"].find("*") > -1:
+					hasPointerParam = True
+			if method["type"].find("*") == -1 and hasPointerParam == False: #do not add raw pointer return methods or methods that take raw pointers
+				methods.append(method)
 			parsedMethods.append(pm["name"])
-			methods.append(method)
 		return methods
 
 	# ----------------------------------------------------

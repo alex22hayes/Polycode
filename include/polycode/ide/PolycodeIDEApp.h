@@ -61,7 +61,7 @@ public:
 #endif
 	~PolycodeIDEApp();
 	
-	void handleEvent(Event *event);	
+	void handleEvent(Event *event); 
 	bool Update();
 	
 	void saveConfigFile();
@@ -131,12 +131,13 @@ protected:
 	bool runNextFrame;
 
 	Object configFile;
+	Scene *mainScene;
 
 	bool willRunProject;
 	PolycodeFrame *frame;
 	
 	PolycodeEditorManager *editorManager;
-	PolycodeProjectManager *projectManager;	
+	PolycodeProjectManager *projectManager; 
 	PolycodeRemoteDebugger *debugger;
 
 	UIMenuBar *menuBar;

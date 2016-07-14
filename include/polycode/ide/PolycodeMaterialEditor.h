@@ -26,6 +26,7 @@
 #include <Polycode.h>
 #include "polycode/modules/ui/PolycodeUI.h"
 #include "polycode/ide/PolycodeProps.h"
+#include <memory>
 
 using namespace Polycode;
 
@@ -38,10 +39,10 @@ public:
 		cubemap = NULL;
 		postMaterial = NULL;
 	}
-	Material *material;
-	Material *postMaterial;
-	Shader *shader;
-	Cubemap *cubemap;
+	std::shared_ptr<Material> material;
+	std::shared_ptr<Material> postMaterial;
+	std::shared_ptr<Shader> shader;
+	std::shared_ptr<Cubemap> cubemap;
 	String name;
 };
 
@@ -49,10 +50,11 @@ class MaterialPreviewBox : public UIElement {
 	public:
 		MaterialPreviewBox();
 		~MaterialPreviewBox();
-		void setMaterial(Material *material);		
+		void setMaterial(std::shared_ptr<Material> material);		
 		void showPrimitive(unsigned int index);
 		void clearMaterial();
-		
+		void Render(GPUDrawBuffer *buffer);
+	
 		void handleEvent(Event *event);
 		
 		Scene *previewScene;
@@ -67,7 +69,7 @@ class MaterialPreviewBox : public UIElement {
 		
 		Entity *previewBase;		
 		ScenePrimitive *previewPrimitive;	
-		Material *currentMaterial;					
+		std::shared_ptr<Material> currentMaterial;					
 };
 
 class MaterialPreviewProp : public PropProp {
@@ -81,7 +83,7 @@ class PostPreviewBox : public UIElement {
 	public:
 		PostPreviewBox();
 		~PostPreviewBox();
-		void setMaterial(Material *material);
+		void setMaterial(std::shared_ptr<Material> material);
 		void clearMaterial();		
 		void handleEvent(Event *event);
 		void Resize(Number width, Number height);
@@ -92,7 +94,7 @@ class PostPreviewBox : public UIElement {
 		UIRect *previewShape;				
 		Entity *previewBase;		
 		ScenePrimitive *previewPrimitive;	
-		Material *currentMaterial;	
+		std::shared_ptr<Material> currentMaterial;	
 		UIRect *headerBg;
 				
 		Number spinValue;
@@ -115,10 +117,10 @@ class MaterialBrowser : public UIElement {
 		
 		void Resize(Number width, Number height);
 		
-		UITree *addMaterial(Material *material);
-		UITree *addShader(Shader *shader);
-		UITree *addCubemap(Cubemap *cubemap);
-		UITree *addPostMaterial(Material *material);
+		UITree *addMaterial(std::shared_ptr<Material> material);
+		UITree *addShader(std::shared_ptr<Shader> shader);
+		UITree *addCubemap(std::shared_ptr<Cubemap> cubemap);
+		UITree *addPostMaterial(std::shared_ptr<Material> material);
 		
 		void removeSelected();
 		
@@ -126,7 +128,7 @@ class MaterialBrowser : public UIElement {
 		
 		MaterialBrowserData *selectedData;
 
-		UIImageButton *newShaderButton;	
+		UIImageButton *newShaderButton; 
 		UIImageButton *newMaterialButton;
 		UIImageButton *newCubemapButton;
 		UIImageButton *newPostButton;
@@ -143,7 +145,7 @@ class MaterialBrowser : public UIElement {
 		UITree *cubemapsNode;
 		UITree *postEffectsNode;
 			
-		UITreeContainer *treeContainer;	
+		UITreeContainer *treeContainer; 
 };
 
 class CubemapEditorPane : public UIElement {
@@ -151,13 +153,13 @@ class CubemapEditorPane : public UIElement {
 		CubemapEditorPane(ResourcePool *resourcePool);
 		~CubemapEditorPane();
 		void Resize(Number width, Number height);
-		void setCubemap(Cubemap *cubemap);
+		void setCubemap(std::shared_ptr<Cubemap> cubemap);
 		void handleEvent(Event *event);
-		Cubemap *currentCubemap;		
+		std::shared_ptr<Cubemap> currentCubemap;		
 		
-        void Activate();
-        void Deactivate();
-    
+		void Activate();
+		void Deactivate();
+	
 	protected:
 	
 		PropList *propList;
@@ -180,13 +182,13 @@ class PostEditorPane : public UIElement {
 		PostEditorPane(ResourcePool *resourcePool);
 		~PostEditorPane();
 		void Resize(Number width, Number height);
-		void setMaterial(Material *material);
+		void setMaterial(std::shared_ptr<Material> material);
 		void handleEvent(Event *event);
-		Material *currentMaterial;	
+		std::shared_ptr<Material> currentMaterial;	
 		
-        void Activate();
-        void Deactivate();
-    
+		void Activate();
+		void Deactivate();
+	
 		void adjustPreview();
 		
 		protected:
@@ -219,18 +221,18 @@ class ShaderEditorPane : public UIElement {
 		ShaderEditorPane(ResourcePool *resourcePool);
 		~ShaderEditorPane();
 		void Resize(Number width, Number height);
-		void setShader(Shader *shader);
+		void setShader(std::shared_ptr<Shader> shader);
 		
 		void handleEvent(Event *event);
 		
 		void reloadPrograms();
 
-		Shader *currentShader;
+		std::shared_ptr<Shader> currentShader;
 		PolycodeProject *parentProject;
 			
 	protected:
 	
-        ResourcePool *resourcePool;
+		ResourcePool *resourcePool;
 		bool changingShader;
 
 		bool choosingVertexProgram;
@@ -254,18 +256,18 @@ class MaterialEditorPane : public UIElement {
 	public:
 		MaterialEditorPane();
 		~MaterialEditorPane();
-    
-        void Activate();
-        void Deactivate();
-    
+	
+		void Activate();
+		void Deactivate();
+	
 		
-		void setMaterial(Material *material);
+		void setMaterial(std::shared_ptr<Material> material);
 		void handleEvent(Event *event);
 		
 		void reloadShaders();
 		void Resize(Number width, Number height);	
 		
-		Material *currentMaterial;			
+		std::shared_ptr<Material> currentMaterial;			
 	protected:
 	
 		MaterialPreviewBox *materialPreview;
@@ -279,7 +281,7 @@ class MaterialEditorPane : public UIElement {
 		ComboProp *blendModeProp;
 		ComboProp *shaderProp;
 		
-		ShaderOptionsSheet *shaderOptionsSheet;	
+		ShaderOptionsSheet *shaderOptionsSheet; 
 };
 
 class MaterialMainWindow : public UIElement {
@@ -287,14 +289,14 @@ class MaterialMainWindow : public UIElement {
 	MaterialMainWindow(ResourcePool *resourcePool);
 	~MaterialMainWindow();
 	
-    void Activate();
-    void Deactivate();
-    
+	void Activate();
+	void Deactivate();
+	
 	void Resize(Number width, Number height);
 	
 	MaterialEditorPane *materialPane;
 	ShaderEditorPane *shaderPane;	
-	CubemapEditorPane *cubemapPane;	
+	CubemapEditorPane *cubemapPane; 
 	PostEditorPane *postPane;	
 		
 	UIColorPicker *colorPicker;
@@ -308,27 +310,27 @@ class PolycodeMaterialEditor : public PolycodeEditor {
 	bool openFile(OSFileEntry filePath);
 	void Resize(int x, int y);
 	
-    void Activate();
-    void Deactivate();
+	void Activate();
+	void Deactivate();
 	
 	void handleEvent(Event *event);
 	void saveFile();
-	void saveMaterials(ObjectEntry *materialsEntry, std::vector<Material*> materials);
+	void saveMaterials(ObjectEntry *materialsEntry, std::vector<std::shared_ptr<Material> > materials);
 	
 	static String createStringValue(unsigned int type, void *value);
 	
 	protected:
-    
-        ResourcePool *resourcePool;
+	
+		ResourcePool *resourcePool;
 		
 		MaterialBrowser *materialBrowser;
 		UIHSizer *mainSizer;
 		
 		MaterialMainWindow *mainWindow;
-		std::vector<Material*> materials;
-		std::vector<Shader*> shaders;
-		std::vector<Cubemap*> cubemaps;
-		std::vector<Material*> postMaterials;
+		std::vector<std::shared_ptr<Material> > materials;
+		std::vector<std::shared_ptr<Shader> > shaders;
+		std::vector<std::shared_ptr<Cubemap> > cubemaps;
+		std::vector<std::shared_ptr<Material> > postMaterials;
 								
 		UITree *selectedMaterialNode;
 };

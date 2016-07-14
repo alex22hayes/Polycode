@@ -29,54 +29,55 @@ THE SOFTWARE.
 #include "polycode/core/PolyMatrix4.h"
 #include "polycode/core/PolyResource.h"
 #include <string.h>
+#include <memory>
 
 namespace Polycode {
 
 	class Cubemap;
 	class ShaderBinding;
 	class Texture;
-    class VertexDataArray;
-    class LocalShaderParam;
-    class RenderBuffer;
-    class CoreMutex;
-    
+	class VertexDataArray;
+	class LocalShaderParam;
+	class RenderBuffer;
+	class CoreMutex;
+	
 	class _PolyExport ProgramParam {
 		public:
 	
-        ProgramParam();
-        
-        String name;
-        int type;
-        void *platformData;
-        LocalShaderParam *globalParam;
+		ProgramParam();
+		
+		String name;
+		int type;
+		void *platformData;
+		LocalShaderParam *globalParam;
 
-        static void *createParamData(int type);
-        
-        static const int PARAM_UNKNOWN = 0;	
-        static const int PARAM_NUMBER = 1;
-        static const int PARAM_VECTOR2 = 2;		
-        static const int PARAM_VECTOR3 = 3;
-        static const int PARAM_COLOR = 4;
-        static const int PARAM_MATRIX = 5;
-        static const int PARAM_TEXTURE = 6;
-        static const int PARAM_CUBEMAP = 7;
+		static void *createParamData(int type);
+		
+		static const int PARAM_UNKNOWN = 0; 
+		static const int PARAM_NUMBER = 1;
+		static const int PARAM_VECTOR2 = 2;		
+		static const int PARAM_VECTOR3 = 3;
+		static const int PARAM_COLOR = 4;
+		static const int PARAM_MATRIX = 5;
+		static const int PARAM_TEXTURE = 6;
+		static const int PARAM_CUBEMAP = 7;
 	};
 	
-    class _PolyExport ProgramAttribute {
-        public:
-            ProgramAttribute();
-        
-            int size;
-            String name;
-            int arrayType;
-            void *platformData;
-    };
-    
+	class _PolyExport ProgramAttribute {
+		public:
+			ProgramAttribute();
+		
+			int size;
+			String name;
+			int arrayType;
+			void *platformData;
+	};
+	
 	typedef struct {
 		Texture *texture;
 		String name;
 	} TextureBinding;
-    
+	
 	typedef struct {
 		Cubemap *cubemap;
 		String name;
@@ -97,34 +98,30 @@ namespace Polycode {
 	class _PolyExport Shader : public Resource {
 		public:
 			explicit Shader();
+			Shader(std::shared_ptr<ShaderProgram> vp, std::shared_ptr<ShaderProgram> fp);
 			virtual ~Shader();
 
 			int getType() const;
 			void setName(const String& name);
 			const String& getName() const;
 			
-            ProgramParam *getParamPointer(const String &name);
-            ProgramAttribute *getAttribPointer(const String &name);
-        
+			ProgramParam *getParamPointer(const String &name);
+			ProgramAttribute *getAttribPointer(const String &name);
+		
 			virtual void reload() {}
 			
 			int getExpectedParamType(String name);
-			
-			virtual void setVertexProgram(ShaderProgram *vp) {}
-			virtual void setFragmentProgram(ShaderProgram *fp) {}
 
 			int numSpotLights;
 			int numPointLights;
-			
-			std::vector<String> expectedTextures;
-			std::vector<String> expectedCubemaps;			
+						
 			std::vector<ProgramParam> expectedParams;
 			std::vector<ProgramAttribute> expectedAttributes;
 								
 			bool screenShader;
 			
-			ShaderProgram *vertexProgram;
-			ShaderProgram *fragmentProgram;
+			std::shared_ptr<ShaderProgram> vertexProgram;
+			std::shared_ptr<ShaderProgram> fragmentProgram;
 		
 			String name;
 	};
@@ -137,7 +134,7 @@ namespace Polycode {
 			Number width;
 			Number height;
 			int sizeMode;
-			RenderBuffer *buffer;
+			std::shared_ptr<RenderBuffer> buffer;
 			
 			Number normalizedWidth;
 			Number normalizedHeight;
@@ -148,54 +145,60 @@ namespace Polycode {
 	
 	class LocalShaderParam : public PolyBase {
 		public:
-        
-            LocalShaderParam();
-            ~LocalShaderParam();
-            LocalShaderParam *Copy();
-        
+		
+			LocalShaderParam();
+			~LocalShaderParam();
+			std::shared_ptr<LocalShaderParam> Copy();
+		
 			String name;
 			void *data;
 			int type;
-            bool ownsPointer;
-            unsigned int arraySize;
-            ProgramParam *param;
+			bool ownsPointer;
+			unsigned int arraySize;
+			ProgramParam *param;
+		
+			std::shared_ptr<Texture> texturePtr;
+			std::shared_ptr<Cubemap> cubemapPtr;
+		
+			// Convenience getters/setters for Lua users
+			Number getNumber();
+			Vector2 getVector2();
+			Vector3 getVector3();
+			Matrix4 getMatrix4();
+			Color getColor();
+			void setNumber(Number x);
+			void setVector2(Vector2 x);
+			void setVector3(Vector3 x);
+			void setMatrix4(Matrix4 x);
+            void setMatrix4Array(std::vector<Matrix4> &x);
+			void setColor(Color x);
+		
+			void setTexture(std::shared_ptr<Texture> texture);
+			std::shared_ptr<Texture> getTexture();
+		
+			void setCubemap(std::shared_ptr<Cubemap> cubemap);
+			std::shared_ptr<Cubemap> getCubemap();
+		
+			void setParamValueFromString(int type, String pvalue);
         
-            // Convenience getters/setters for Lua users
-            Number getNumber();
-            Vector2 getVector2();
-            Vector3 getVector3();
-            Matrix4 getMatrix4();
-            Color getColor();
-            void setNumber(Number x);
-            void setVector2(Vector2 x);
-            void setVector3(Vector3 x);
-            void setMatrix4(Matrix4 x);
-            void setColor(Color x);
-        
-            void setTexture(Texture *texture);
-            Texture *getTexture();
-        
-            void setCubemap(Cubemap *cubemap);
-            Cubemap *getCubemap();
-        
-            void setParamValueFromString(int type, String pvalue);
+            CoreMutex *accessMutex;
 	};
-    
-    class AttributeBinding : public PolyBase {
-        public:
-            AttributeBinding();
-            String name;
-            VertexDataArray *vertexData;
-            ProgramAttribute *attribute;
-            bool enabled;
-    };
+	
+	class AttributeBinding : public PolyBase {
+		public:
+			AttributeBinding();
+			String name;
+			VertexDataArray *vertexData;
+			ProgramAttribute *attribute;
+			bool enabled;
+	};
 	
 	class RenderTargetBinding : public PolyBase {
 		public:
 			String id;
 			String name;
 			int mode;
-			RenderBuffer *buffer;
+			std::shared_ptr<RenderBuffer> buffer;
 			static const int MODE_IN = 0;
 			static const int MODE_OUT = 1;
 			static const int MODE_COLOR = 2;
@@ -206,26 +209,29 @@ namespace Polycode {
 		public:
 			ShaderBinding();
 			virtual ~ShaderBinding();
-        
-            void copyTo(ShaderBinding *targetBinding);
-        
-			LocalShaderParam *addParam(int type, const String& name);
-			LocalShaderParam *addParamPointer(int type, const String& name, void *ptr);        
+		
+			void copyTo(ShaderBinding *targetBinding);
+		
+			std::shared_ptr<LocalShaderParam> addParam(int type, const String& name);
+			std::shared_ptr<LocalShaderParam> addParamPointer(int type, const String& name, void *ptr);
+		
+			std::shared_ptr<LocalShaderParam> addParamFromData(const String &name, const String &data);
+		
 			unsigned int getNumLocalParams();
-			LocalShaderParam *getLocalParam(unsigned int index);
-			LocalShaderParam *getLocalParamByName(const String& name);
-        
-            void removeParam(const String &name);
-        
-            Texture *loadTextureForParam(const String &paramName, const String &fileName);
-            void setTextureForParam(const String &paramName, Texture *texture);
-            void setCubemapForParam(const String &paramName, Cubemap *cubemap);
-        
-            unsigned int getNumAttributeBindings();
-            AttributeBinding *getAttributeBinding(unsigned int index);
-        
-            AttributeBinding *addAttributeBinding(const String &name, VertexDataArray *dataArray);
-            AttributeBinding *getAttributeBindingByName(const String &name);
+			std::shared_ptr<LocalShaderParam> getLocalParam(unsigned int index);
+			std::shared_ptr<LocalShaderParam> getLocalParamByName(const String& name);
+		
+			void removeParam(const String &name);
+		
+			std::shared_ptr<Texture> loadTextureForParam(const String &paramName, const String &fileName);
+			void setTextureForParam(const String &paramName, std::shared_ptr<Texture> texture);
+			void setCubemapForParam(const String &paramName, std::shared_ptr<Cubemap> cubemap);
+		
+			unsigned int getNumAttributeBindings();
+			AttributeBinding *getAttributeBinding(unsigned int index);
+		
+			AttributeBinding *addAttributeBinding(const String &name, VertexDataArray *dataArray);
+			AttributeBinding *getAttributeBindingByName(const String &name);
 			
 			void addRenderTargetBinding(RenderTargetBinding *binding);
 			void removeRenderTargetBinding(RenderTargetBinding *binding);
@@ -244,20 +250,19 @@ namespace Polycode {
 
 			unsigned int getNumOutTargetBindings();
 			RenderTargetBinding *getOutTargetBinding(unsigned int index);
-        
-			std::vector<LocalShaderParam*> localParams;
+		
+			std::vector<std::shared_ptr<LocalShaderParam> > localParams;
 			std::vector<AttributeBinding*> attributes;
-        
+		
 			std::vector<RenderTargetBinding*> renderTargetBindings;
 			std::vector<RenderTargetBinding*> inTargetBindings;
 			std::vector<RenderTargetBinding*> outTargetBindings;
 			std::vector<RenderTargetBinding*> colorTargetBindings;
 			std::vector<RenderTargetBinding*> depthTargetBindings;
-        
-            bool resetAttributes;
-            Shader *targetShader;
-        
-            CoreMutex *accessMutex;
+		
+			std::shared_ptr<Shader> targetShader;
+		
+			CoreMutex *accessMutex;
 	};
 
 }

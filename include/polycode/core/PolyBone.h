@@ -53,19 +53,19 @@ namespace Polycode {
 			* Sets the parent bone of this bone.
 			* @param bone New parent bone.
 			*/
-			void setParentBone(Bone *bone);
+			void setParentBone(std::shared_ptr<Bone> bone);
 			
 			/**
 			* Adds another bone as the child of this bone.
 			* @param bone New parent bone.
 			*/			
-			void addChildBone(Bone *bone);
+			void addChildBone(std::shared_ptr<Bone> bone);
 			
 			/**
 			* Returns the parent bone of this bone.
 			* @return Parent bone of this bone.
 			*/						
-			Bone* getParentBone();
+			std::shared_ptr<Bone> getParentBone();
 			
 			/**
 			* Returns the number of child bones of this bone.
@@ -78,7 +78,7 @@ namespace Polycode {
 			* @param index Index of the child bone to return.
 			* @return Parent bone of this bone.
 			*/									
-			Bone *getChildBone(unsigned int index);
+			std::shared_ptr<Bone> getChildBone(unsigned int index);
 
 			/**
 			* Returns the bone matrix
@@ -138,12 +138,12 @@ namespace Polycode {
 			* @return Full base matrix.
 			*/						
 			Matrix4 getFullBaseMatrix() const;
-        
-            void rebuildFinalMatrix();
-            Matrix4 buildFinalMatrix() const;
-        
-        
-            void intializeBone(const Vector3 &basePosition, const Vector3 &baseScale, const Quaternion &baseRotation, const Vector3 &restPosition, const Vector3 &restScale, const Quaternion &restRotation);
+		
+			void rebuildFinalMatrix();
+			Matrix4 buildFinalMatrix() const;
+		
+		
+			void intializeBone(const Vector3 &basePosition, const Vector3 &baseScale, const Quaternion &baseRotation, const Vector3 &restPosition, const Vector3 &restScale, const Quaternion &restRotation);
 		
 			/**
 			* Id of the bone.
@@ -153,17 +153,17 @@ namespace Polycode {
 			Matrix4 boneMatrix;
 			Matrix4 restMatrix;
 			Matrix4 baseMatrix;
-            Matrix4 finalMatrix;
+			Matrix4 finalMatrix;
 		
-            Quaternion baseRotation;
-            Vector3 baseScale;
-            Vector3 basePosition;
-        
-            bool disableAnimation;
-        
+			Quaternion baseRotation;
+			Vector3 baseScale;
+			Vector3 basePosition;
+		
+			bool disableAnimation;
+		
 		protected:
-			Bone* parentBone;
-			std::vector<Bone*> childBones;
+			std::shared_ptr<Bone> parentBone;
+			std::vector<std::shared_ptr<Bone> > childBones;
 			String boneName;
 	};
 

@@ -23,8 +23,8 @@
 #pragma once
 #include "polycode/core/PolyGlobals.h"
 #include "polycode/core/PolyEntity.h"
-#include "polycode/core/PolySceneImage.h"
 #include "polycode/core/PolySceneLabel.h"
+#include <memory>
 
 namespace Polycode {
 	/*
@@ -39,9 +39,9 @@ namespace Polycode {
 			virtual ~UIElement();
 			
 			virtual void Resize(Number width, Number height);
-        
-            Vector2 getScreenPositionForMainCamera();
-        
+		
+			Vector2 getScreenPositionForMainCamera();
+		
 			bool hasFocus;
 			bool focusable;
 			
@@ -50,15 +50,15 @@ namespace Polycode {
 			bool isDragged();
 			void startDrag(Number xOffset, Number yOffset);
 			void stopDrag();
-        
-            void handleEvent(Event *event);
+		
+			void handleEvent(Event *event);
 			
 			void focusChild(UIElement *child);
 			void focusNextChild();
 			void focusPreviousChild();
 			bool isFocusable();
 			void focusSelf();
-        
+		
 			virtual void onLoseFocus() {}
 			virtual void onGainFocus() {}
 			
@@ -89,54 +89,57 @@ namespace Polycode {
 	class _PolyExport UIRect : public UIElement {
 		public:
 			UIRect(String fileName);
-            UIRect(String fileName, Number width, Number height);
+			UIRect(String fileName, Number width, Number height);
 			UIRect(Number width, Number height);
 			void initRect(Number width, Number height);
 			~UIRect();
 			void Resize(Number width, Number height);
 			void Render(GPUDrawBuffer *buffer);
 			void loadTexture(String fileName);
-			void setTexture(Texture *texture);
+			void setTexture(std::shared_ptr<Texture> texture);
 			void setImageCoordinates(Number x, Number y, Number width, Number height, Number imageScale = 1.0);
 			Number getImageWidth() const;
 			Number getImageHeight() const;
-            void setMaterial(Material *material);
-        
-			Texture *getTexture();			
+			void setMaterial(std::shared_ptr<Material> material);
+		
+			std::shared_ptr<Texture> getTexture();			
 		protected:
 		
 			Number imageWidth;
 			Number imageHeight;
-        
-            Material *material;
-            std::vector<ShaderPass> shaderPasses;
+		
+			std::shared_ptr<Material> material;
+			std::vector<ShaderPass> shaderPasses;
 			
 			Mesh *rectMesh;
-            MeshGeometry rectMeshGeometry;
+			MeshGeometry rectMeshGeometry;
 
-			Texture *texture;
-			
+			std::shared_ptr<Texture> texture;
 	};
 	
 	class _PolyExport UILabel : public UIElement {
 		public:
 			UILabel(const String& text, int size=-1, const String& fontName = "sans", int amode = 0);
 			void setText(const String& text);
-            void setLabelColor(const Color &color);
+			void setLabelColor(const Color &color);
 			Label *getLabel();
 			String getText();
+
+			void setColor(Color color);
+			void setColorInt(int r, int g, int b, int a);
+			void setColor(Number r, Number g, Number b, Number a);
 			
 			~UILabel();			
 		protected:
 			SceneLabel *label;
 	};
-    
+	
 	class _PolyExport UIMultilineLabel : public UIElement {
-    public:
-        UIMultilineLabel(const String& text, int size, int spacing, const String& fontName = "sans", int amode = 0);
-        void setText(const String& text);
-        String getText();
-        
+	public:
+		UIMultilineLabel(const String& text, int size, int spacing, const String& fontName = "sans", int amode = 0);
+		void setText(const String& text);
+		String getText();
+		
 		/**
 		* Sets the color of the Labels as normalized floating point values.
 		* @param r Red value as a 0-1 floating point number.
@@ -171,23 +174,23 @@ namespace Polycode {
 		*/
 		Number getHeight();
 
-        ~UIMultilineLabel();
-    protected:
-        
-        int labelSize;
-        String labelFontName;
-        int labelAAMode;
-        int spacing;
+		~UIMultilineLabel();
+	protected:
+		
+		int labelSize;
+		String labelFontName;
+		int labelAAMode;
+		int spacing;
 		int linesCount;
 
-        void clearLabels();
-        std::vector<UILabel*> labels;
+		void clearLabels();
+		std::vector<UILabel*> labels;
 	};
-    	
+		
 	class _PolyExport UIImage : public UIRect {
 		public:
 			UIImage(String imagePath);
-            UIImage(String imagePath, int width, int height);
+			UIImage(String imagePath, int width, int height);
 	};
 	
 }

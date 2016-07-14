@@ -26,10 +26,8 @@
 #include "polycode/core/PolyInputEvent.h"
 #include "polycode/core/PolyLogger.h"
 #include "polycode/core/PolyResourceManager.h"
-#include "polycode/core/PolyMaterialManager.h"
 #include "polycode/core/PolyRenderer.h"
 #include "polycode/core/PolyConfig.h"
-#include "polycode/core/PolySceneManager.h"
 #include "polycode/core/PolyTimerManager.h"
 #include "polycode/core/PolyTweenManager.h"
 #include "polycode/core/PolySoundManager.h"
@@ -41,7 +39,7 @@ CoreMutex *CoreServices::renderMutex = 0;
 CoreServices* CoreServices::overrideInstance = NULL;
 
 CoreServices *Polycode::Services() {
-    return CoreServices::getInstance();
+	return CoreServices::getInstance();
 }
 
 CoreMutex *CoreServices::getRenderMutex() {
@@ -58,16 +56,12 @@ void CoreServices::setInstance(CoreServices *_instance) {
 }
 
 void CoreServices::createInstance() {
-    overrideInstance = new CoreServices;
-    Logger::log("Creating new core services instance...\n");
+	overrideInstance = new CoreServices;
+	Logger::log("Creating new core services instance...\n");
 }
 
 CoreServices* CoreServices::getInstance() {
-    return overrideInstance;
-}
-
-MaterialManager *CoreServices::getMaterialManager() {
-	return materialManager;
+	return overrideInstance;
 }
 
 TimerManager *CoreServices::getTimerManager() {
@@ -88,23 +82,18 @@ CoreServices::CoreServices() : EventDispatcher() {
 	logger = Logger::getInstance();
 	resourceManager = new ResourceManager();	
 	config = new Config();
-	materialManager = new MaterialManager();	
-	sceneManager = new SceneManager();
 	timerManager = new TimerManager();
 	tweenManager = new TweenManager();
 	soundManager = new SoundManager();
 }
 
 CoreServices::~CoreServices() {
-	delete materialManager;
-	delete sceneManager;
 	delete timerManager;
 	delete tweenManager;
 	delete resourceManager;
 	delete soundManager;
-    delete logger;
-    delete config;
-    delete renderer;
+	delete logger;
+	delete config;
 
 	instanceMap.clear();
 	overrideInstance = NULL;
@@ -127,40 +116,26 @@ CoreInput *CoreServices::getInput() {
 
 void CoreServices::setRenderer(Renderer *renderer) {
 	this->renderer = renderer;
-	sceneManager->setRenderer(renderer);
 }
 
 Renderer *CoreServices::getRenderer() {
 	return renderer;
 }
 
-void CoreServices::Render(const Polycode::Rectangle &viewport) {
-
-//	renderer->setPerspectiveDefaults();
-	sceneManager->renderVirtual();
-	sceneManager->Render(viewport);
-//	renderer->clearLights();
-}
 
 void CoreServices::fixedUpdate() {
-    sceneManager->fixedUpdate();
+
 }
 
 void CoreServices::Update(int elapsed) {
 	resourceManager->Update(elapsed);
-	timerManager->Update();	
-	tweenManager->Update(elapsed);	
-	materialManager->Update(elapsed);		
-	sceneManager->Update();
-    soundManager->Update();
+	timerManager->Update(); 
+	tweenManager->Update(elapsed);		
+		soundManager->Update();
 }
 
 SoundManager *CoreServices::getSoundManager() {
 	return soundManager;
-}
-
-SceneManager *CoreServices::getSceneManager() {
-	return sceneManager;
 }
 
 TweenManager *CoreServices::getTweenManager() {

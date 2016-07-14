@@ -36,7 +36,7 @@ NumberVal(0.0),
 length(0),
 intVal(0)
 {
-    
+	
 }
 
 void ObjectEntry::Clear() {
@@ -95,13 +95,26 @@ Object::~Object() {
 	
 }
 
+String Object::saveToXMLString() {
+	TiXmlPrinter printer;
+	TiXmlDocument doc;
+	TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "", "");
+	doc.LinkEndChild(decl);
+
+	TiXmlElement * rootElement = createElementFromObjectEntry(&root);
+	doc.LinkEndChild(rootElement);
+	printer.SetIndent("    ");
+	doc.Accept(&printer);
+	return String(printer.CStr());
+}
+
 void Object::saveToXML(const String& fileName) {
-	TiXmlDocument doc;  	
-	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );  
+	TiXmlDocument doc;		
+	TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );	 
 	doc.LinkEndChild( decl ); 
  
 	TiXmlElement * rootElement = createElementFromObjectEntry(&root);
-	doc.LinkEndChild(rootElement);  	
+	doc.LinkEndChild(rootElement);		
 	
 	doc.SaveFile(fileName.c_str()); 
 }
@@ -143,7 +156,7 @@ TiXmlElement *Object::createElementFromObjectEntry(ObjectEntry *entry) {
 						break;
 						case ObjectEntry::FLOAT_ENTRY: {
 							std::ostringstream o; // Avoid NumberToString, it truncates
-                            o << std::fixed;
+							o << std::fixed;
 							o << childEntry->NumberVal;
 							newElement->SetAttribute(childTypedName.c_str(), o.str().c_str());
 						} break;
@@ -427,7 +440,7 @@ bool BinaryObjectReader::readFile() {
 		free(buffer);
 	}
 	
-	inFile->read(&data32, sizeof(uint32_t), 1);	
+	inFile->read(&data32, sizeof(uint32_t), 1); 
 	
 	return parseEntryFromFile(&object->root);
 	

@@ -19,6 +19,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
+
+
  
 #include "polycode/ide/PolycodeMaterialEditor.h"
 #include "polycode/ide/PolycodeFrame.h"
@@ -93,13 +95,13 @@ PostEditorPane::PostEditorPane(ResourcePool *resourcePool) : UIElement() {
 }
 
 void PostEditorPane::Activate() {
-    postPreview->previewScene->enabled = true;
-    postPreview->renderTexture->enabled = true;
+	postPreview->previewScene->enabled = true;
+	postPreview->renderTexture->enabled = true;
 }
 
 void PostEditorPane::Deactivate() {
-    postPreview->previewScene->enabled = false;
-    postPreview->renderTexture->enabled = false;
+	postPreview->previewScene->enabled = false;
+	postPreview->renderTexture->enabled = false;
 }
 
 
@@ -116,7 +118,7 @@ void PostEditorPane::Resize(Number width, Number height) {
 	propList->updateProps();
 	optionsPropList->Resize(width/2.0, height- mainSizer->getMainHeight());
 	optionsPropList->setPosition(floor(width/2.0), optionsPropList->getPosition().y);
-	optionsPropList->updateProps();	
+	optionsPropList->updateProps(); 
 	UIElement::Resize(width, height);
 	adjustPreview();
 }
@@ -128,7 +130,7 @@ void PostEditorPane::adjustPreview() {
 }
 
 
-void PostEditorPane::setMaterial(Material *material) {
+void PostEditorPane::setMaterial(std::shared_ptr<Material> material) {
 	enabled = true;
 	currentMaterial = material;		
 		
@@ -178,8 +180,8 @@ void PostEditorPane::handleEvent(Event *event) {
 		} else if(event->getEventCode() == Event::SELECT_EVENT) {
 			if(passProps->selectedProp) {
 				int shaderIndex = passProps->selectedProp->shaderIndex;
-				Material *material = passProps->selectedProp->material;
-				ShaderBinding *binding = material->getShaderBinding(shaderIndex);
+				std::shared_ptr<Material> material = passProps->selectedProp->material;
+				std::shared_ptr<ShaderBinding> binding = material->getShaderBinding(shaderIndex);
 				targetBindingProps->setShader(currentMaterial->getShader(shaderIndex), material, binding);
 				shaderOptionsSheet->setShader(currentMaterial->getShader(shaderIndex), material, binding);
 				optionsPropList->visible = true;
@@ -201,7 +203,7 @@ CubemapEditorPane::CubemapEditorPane(ResourcePool *resourcePool) : UIElement() {
 	headerBg = new UIRect(10,10);
 	addChild(headerBg);
 	headerBg->setAnchorPoint(-1.0, -1.0, 0.0);
-	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor"));	
+	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor")); 
 	
 	propList = new PropList("CUBEMAP EDITOR");
 	addChild(propList);
@@ -210,7 +212,7 @@ CubemapEditorPane::CubemapEditorPane(ResourcePool *resourcePool) : UIElement() {
 	PropSheet *previewProps = new PropSheet("CUBEMAP PREVIEW", "");
 	propList->addPropSheet(previewProps);
 	MaterialPreviewProp *materialPreviewProp = new MaterialPreviewProp();
-	previewProps->addProp(materialPreviewProp);	
+	previewProps->addProp(materialPreviewProp); 
 	cubemapPreview = materialPreviewProp->previewBox;
 	previewProps->propHeight = 300;		
 
@@ -249,7 +251,8 @@ CubemapEditorPane::CubemapEditorPane(ResourcePool *resourcePool) : UIElement() {
 	baseProps->propHeight = 420;
 	propList->updateProps();
 		
-	Material *previewMaterial = (Material*) CoreServices::getInstance()->getResourceManager()->getGlobalPool()->getResource(Resource::RESOURCE_MATERIAL, "SkyBox");
+	std::shared_ptr<Material> previewMaterial = std::static_pointer_cast<Material>(Services()->getResourceManager()->getGlobalPool()->getResource(Resource::RESOURCE_MATERIAL, "SkyBox"));
+	
 	cubemapPreview->setMaterial(previewMaterial);
 	enabled = false;
 	
@@ -257,23 +260,23 @@ CubemapEditorPane::CubemapEditorPane(ResourcePool *resourcePool) : UIElement() {
 
 
 void CubemapEditorPane::Activate() {
-    cubemapPreview->previewScene->enabled = true;
-    cubemapPreview->renderTexture->enabled = true;
+	cubemapPreview->previewScene->enabled = true;
+	cubemapPreview->renderTexture->enabled = true;
 }
 
 void CubemapEditorPane::Deactivate() {
-    cubemapPreview->previewScene->enabled = false;
-    cubemapPreview->renderTexture->enabled = false;
+	cubemapPreview->previewScene->enabled = false;
+	cubemapPreview->renderTexture->enabled = false;
 }
 
 
-void CubemapEditorPane::setCubemap(Cubemap *cubemap) {
+void CubemapEditorPane::setCubemap(std::shared_ptr<Cubemap> cubemap) {
 	enabled = true;
 	currentCubemap = cubemap;
 	
 	nameProp->set(cubemap->getResourceName());
 
-    // RENDERER_TODO
+	// RENDERER_TODO
 //	cubemapPreview->previewPrimitive->getLocalShaderOptions()->clearCubemap("lightCube");
 //	cubemapPreview->previewPrimitive->getLocalShaderOptions()->addCubemap("lightCube", cubemap);
 	
@@ -344,14 +347,14 @@ void CubemapEditorPane::Resize(Number width, Number height) {
 
 ShaderEditorPane::ShaderEditorPane(ResourcePool *resourcePool) : UIElement() {
 
-    this->resourcePool = resourcePool;
+	this->resourcePool = resourcePool;
 	changingShader = false;
 	currentShader = NULL;
 
 	headerBg = new UIRect(10,10);
 	addChild(headerBg);
 	headerBg->setAnchorPoint(-1.0, -1.0, 0.0);
-	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor"));	
+	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor")); 
 	
 	propList = new PropList("SHADER EDITOR");
 	addChild(propList);
@@ -371,7 +374,7 @@ ShaderEditorPane::ShaderEditorPane(ResourcePool *resourcePool) : UIElement() {
 	
 	vertexProgramProp = new ComboProp("Vertex prog.");
 	baseProps->addProp(vertexProgramProp);	
-	vertexProgramProp->addEventListener(this, Event::CHANGE_EVENT);	
+	vertexProgramProp->addEventListener(this, Event::CHANGE_EVENT); 
 
 	fragmentProgramProp = new ComboProp("Fragment prog.");
 	baseProps->addProp(fragmentProgramProp);	
@@ -382,7 +385,7 @@ ShaderEditorPane::ShaderEditorPane(ResourcePool *resourcePool) : UIElement() {
 	pointLightsProp->addEventListener(this, Event::CHANGE_EVENT);
 
 	spotLightsProp = new NumberProp("Num spotlights", this);
-	baseProps->addProp(spotLightsProp);	
+	baseProps->addProp(spotLightsProp); 
 	spotLightsProp->addEventListener(this, Event::CHANGE_EVENT);
 
 	baseProps->propHeight = 220;
@@ -420,9 +423,9 @@ void ShaderEditorPane::handleEvent(Event *event) {
 		}		
 		
 		if(event->getDispatcher() == vertexProgramProp) {
-			ShaderProgram* vpProgram = (ShaderProgram*)vertexProgramProp->comboEntry->getSelectedItem()->data;
-			if(vpProgram) {			
-				currentShader->setVertexProgram(vpProgram);
+			std::shared_ptr<ShaderProgram> vpProgram = std::static_pointer_cast<ShaderProgram>(vertexProgramProp->comboEntry->getSelectedItem()->sharedData);
+			if(vpProgram) {
+				currentShader->vertexProgram = vpProgram;
 				dispatchEvent(new Event(), Event::CHANGE_EVENT);
 			} else {
 				globalFrame->assetBrowser->addEventListener(this, UIEvent::OK_EVENT);
@@ -434,9 +437,9 @@ void ShaderEditorPane::handleEvent(Event *event) {
 		}		
 
 		if(event->getDispatcher() == fragmentProgramProp) {
-			ShaderProgram* fpProgram = (ShaderProgram*)fragmentProgramProp->comboEntry->getSelectedItem()->data;
-			if(fpProgram) {			
-				currentShader->setFragmentProgram(fpProgram);
+			std::shared_ptr<ShaderProgram> fpProgram = std::static_pointer_cast<ShaderProgram>(fragmentProgramProp->comboEntry->getSelectedItem()->sharedData);
+			if(fpProgram) {
+				currentShader->fragmentProgram = fpProgram;
 				dispatchEvent(new Event(), Event::CHANGE_EVENT);
 			} else {
 				globalFrame->assetBrowser->addEventListener(this, UIEvent::OK_EVENT);
@@ -454,7 +457,7 @@ void ShaderEditorPane::handleEvent(Event *event) {
 		
 
 		OSFileEntry entry(newProgramPath, OSFileEntry::TYPE_FILE);
-		ShaderProgram *newProgram = CoreServices::getInstance()->getMaterialManager()->createProgramFromFile(newProgramPath);
+		std::shared_ptr<ShaderProgram> newProgram = std::make_shared<ShaderProgram>(newProgramPath);
 		newProgram->reloadOnFileModify = true;
 		if(newProgram) {
 			newProgram->setResourceName(entry.name);
@@ -463,9 +466,9 @@ void ShaderEditorPane::handleEvent(Event *event) {
 		}
 
 		if(choosingVertexProgram) {
-			currentShader->setVertexProgram(newProgram);			
+			currentShader->vertexProgram = newProgram;
 		} else {
-			currentShader->setFragmentProgram(newProgram);		
+			currentShader->fragmentProgram = newProgram;
 		}
 		
 		dispatchEvent(new Event(), Event::CHANGE_EVENT);		
@@ -482,28 +485,27 @@ void ShaderEditorPane::reloadPrograms() {
 	vertexProgramProp->comboEntry->addComboItem("Custom...", NULL);
 	fragmentProgramProp->comboEntry->addComboItem("Custom...", NULL);	
 		
-	std::vector<Resource*> programs = CoreServices::getInstance()->getResourceManager()->getResources(Resource::RESOURCE_PROGRAM);
+	std::vector<std::shared_ptr<Resource> > programResources = CoreServices::getInstance()->getResourceManager()->getResources(Resource::RESOURCE_PROGRAM);
 	
-    // RENDERER_TODO
-    /*
-	for(int i=0; i < programs.size(); i++) {
-		ShaderProgram* program = (ShaderProgram*) programs[i];
+
+	for(auto resource:programResources) {
+		std::shared_ptr<ShaderProgram> program = std::static_pointer_cast<ShaderProgram>(resource);
 		if(program->type == ShaderProgram::TYPE_VERT) {
-			vertexProgramProp->comboEntry->addComboItem(program->getResourceName(), (void*)program);
-			if(program == currentShader->vp) {
+			vertexProgramProp->comboEntry->addComboItemWithSharedData(program->getResourceName(), program);
+			if(program == currentShader->vertexProgram) {
 				vertexProgramProp->comboEntry->setSelectedIndex(vertexProgramProp->comboEntry->getNumItems()-1);
 			}
 		} else if(program->type == ShaderProgram::TYPE_FRAG) {
-			fragmentProgramProp->comboEntry->addComboItem(program->getResourceName(), (void*)program);		
-			if(program == currentShader->fp) {
+			fragmentProgramProp->comboEntry->addComboItemWithSharedData(program->getResourceName(), program);
+			if(program == currentShader->fragmentProgram) {
 				fragmentProgramProp->comboEntry->setSelectedIndex(fragmentProgramProp->comboEntry->getNumItems()-1);
-			}			
+			}
 		}
-	}	
-     */
+	}
+
 }
 
-void ShaderEditorPane::setShader(Shader *shader) {
+void ShaderEditorPane::setShader(std::shared_ptr<Shader> shader) {
 	changingShader = true;
 	
 	currentShader = shader;
@@ -511,23 +513,20 @@ void ShaderEditorPane::setShader(Shader *shader) {
 	reloadPrograms();
 		
 	nameProp->set(shader->getName());
-	
-    // RENDERER_TODO
-    /*
 	for(int i=0; i < vertexProgramProp->comboEntry->getNumItems(); i++) {
-		ShaderProgram* program = (ShaderProgram*) vertexProgramProp->comboEntry->getItemAtIndex(i)->data;
-		if(program == shader->vp) {
+		std::shared_ptr<ShaderProgram> program = std::static_pointer_cast<ShaderProgram>(vertexProgramProp->comboEntry->getItemAtIndex(i)->sharedData);
+		if(program == shader->vertexProgram) {
 			vertexProgramProp->comboEntry->setSelectedIndex(i);
 		}
 	}
 
 	for(int i=0; i < fragmentProgramProp->comboEntry->getNumItems(); i++) {
-		ShaderProgram* program = (ShaderProgram*) fragmentProgramProp->comboEntry->getItemAtIndex(i)->data;
-		if(program == shader->fp) {
+		std::shared_ptr<ShaderProgram> program = std::static_pointer_cast<ShaderProgram>(fragmentProgramProp->comboEntry->getItemAtIndex(i)->sharedData);
+		if(program == shader->fragmentProgram) {
 			fragmentProgramProp->comboEntry->setSelectedIndex(i);
 		}
 	}
-	*/
+	
 	screenShaderProp->set(shader->screenShader);
 	
 	pointLightsProp->set(shader->numPointLights);
@@ -535,7 +534,7 @@ void ShaderEditorPane::setShader(Shader *shader) {
 	
 	enabled = true;
 	
-	changingShader = false;	
+	changingShader = false; 
 }
 
 void ShaderEditorPane::Resize(Number width, Number height) {
@@ -549,7 +548,7 @@ PostPreviewBox::PostPreviewBox() : UIElement() {
 	headerBg = new UIRect(10,10);
 	addChild(headerBg);
 	headerBg->setAnchorPoint(-1.0, -1.0, 0.0);
-	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor"));	
+	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor")); 
 
 	UILabel *label = new UILabel("POST PREVIEW", 18, "section", Label::ANTIALIAS_FULL);
 	label->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderFontColor"));
@@ -557,18 +556,18 @@ PostPreviewBox::PostPreviewBox() : UIElement() {
 	label->setPosition(10, 3);
 
 	currentMaterial = NULL;
-	previewScene = new Scene(Scene::SCENE_3D, true);	
+	previewScene = new Scene(Scene::SCENE_3D);
 	
-	renderTexture = new SceneRenderTexture(previewScene, previewScene->getDefaultCamera(), 256, 256, true);
+	renderTexture = new SceneRenderTexture(256, 256, true);
 
 	previewScene->clearColor.setColor(0.0, 0.0, 0.0, 1.0);	
 	previewScene->ambientColor.setColor(0.0, 0.0, 0.0, 1.0);
 
-	mainLight = new SceneLight(SceneLight::POINT_LIGHT, previewScene, 90.0);
+	mainLight = new SceneLight(SceneLight::POINT_LIGHT, 90.0);
 	mainLight->setPosition(-6,6,6);
 	previewScene->addLight(mainLight);
 
-	secondLight = new SceneLight(SceneLight::POINT_LIGHT, previewScene, 90.0);
+	secondLight = new SceneLight(SceneLight::POINT_LIGHT, 90.0);
 	secondLight->setPosition(6,-6,6);
 	previewScene->addLight(secondLight);
 
@@ -593,7 +592,7 @@ PostPreviewBox::PostPreviewBox() : UIElement() {
 	previewPrimitive->setColorInt(0, 255, 0, 255);
 	previewPrimitive->setPosition(-0.8, 1.0, 0.8);
 
-	previewPrimitive = new ScenePrimitive(ScenePrimitive::TYPE_BOX, 2,  2, 2);	
+	previewPrimitive = new ScenePrimitive(ScenePrimitive::TYPE_BOX, 2,	2, 2);	
 	previewScene->addChild(previewPrimitive);
 	previewPrimitive->setMaterialByName("DefaultHDR");
 	previewPrimitive->setColorInt(0, 0, 255, 255);
@@ -679,12 +678,12 @@ void PostPreviewBox::Resize(Number width, Number height) {
 }
 
 PostPreviewBox::~PostPreviewBox() {
-    previewScene->rootEntity.setOwnsChildrenRecursive(true);
-    delete previewScene;
-    delete renderTexture;
+	previewScene->rootEntity.setOwnsChildrenRecursive(true);
+	delete previewScene;
+	delete renderTexture;
 }
 
-void PostPreviewBox::setMaterial(Material *material) {
+void PostPreviewBox::setMaterial(std::shared_ptr<Material> material) {
 	previewScene->getDefaultCamera()->setPostFilter(material);
 }
 
@@ -705,18 +704,20 @@ void PostPreviewBox::handleEvent(Event *event) {
 
 MaterialPreviewBox::MaterialPreviewBox() : UIElement() {
 	currentMaterial = NULL;
-	previewScene = new Scene(Scene::SCENE_3D, true);	
+	previewScene = new Scene(Scene::SCENE_3D);
 	
-	renderTexture = new SceneRenderTexture(previewScene, previewScene->getDefaultCamera(), 512, 512, false);
+	renderTexture = new SceneRenderTexture(512, 512, false);
 	
 	ScenePrimitive *previewBg = new ScenePrimitive(ScenePrimitive::TYPE_BOX, 15.0, 15.0, 15.0);
 	previewBg->Yaw(45.0);
 	previewBg->backfaceCulled = false;
 	
 	previewBg->setMaterialByName("Unlit");
-	Texture *tex = CoreServices::getInstance()->getMaterialManager()->createTextureFromFile("materialEditor/material_grid.png");
+	ResourcePool *pool = Services()->getResourceManager()->getGlobalPool();
+	std::shared_ptr<Texture> tex = std::static_pointer_cast<Texture>(pool->loadResource("materialEditor/material_grid.png"));
+	
 	if(previewBg->getNumShaderPasses() > 0) {
-        previewBg->getShaderPass(0).shaderBinding->setTextureForParam("diffuse", tex);
+		previewBg->getShaderPass(0).shaderBinding->setTextureForParam("diffuse", tex);
 	}
 	previewScene->addChild(previewBg);
 	
@@ -726,7 +727,7 @@ MaterialPreviewBox::MaterialPreviewBox() : UIElement() {
 	previewPrimitive = new ScenePrimitive(ScenePrimitive::TYPE_TORUS, 3.0, 1.2, 26, 16);
 	previewScene->addChild(previewPrimitive);
 	shapePrimitives.push_back(previewPrimitive);
-    
+	
 
 	previewPrimitive = new ScenePrimitive(ScenePrimitive::TYPE_SPHERE, 3.0, 16, 16);
 	previewScene->addChild(previewPrimitive);
@@ -743,11 +744,11 @@ MaterialPreviewBox::MaterialPreviewBox() : UIElement() {
 	shapePrimitives.push_back(previewPrimitive);	
 
 	
-	mainLight = new SceneLight(SceneLight::POINT_LIGHT, previewScene, 290.0);
+	mainLight = new SceneLight(SceneLight::POINT_LIGHT, 290.0);
 	mainLight->setPosition(-10,10,10);
 	previewScene->addLight(mainLight);
 
-	secondLight = new SceneLight(SceneLight::POINT_LIGHT, previewScene, 250.0);
+	secondLight = new SceneLight(SceneLight::POINT_LIGHT,  250.0);
 	secondLight->setPosition(10,-10,10);
 	previewScene->addLight(secondLight);
 
@@ -783,17 +784,21 @@ MaterialPreviewBox::MaterialPreviewBox() : UIElement() {
 	showPrimitive(0);
 }
 
+void MaterialPreviewBox::Render(GPUDrawBuffer *buffer) {
+	renderTexture->Render(buffer->renderFrame, previewScene, previewScene->getDefaultCamera());
+}
+
 void MaterialPreviewBox::clearMaterial() {
 	previewPrimitive->clearMaterial();
 }
 
 MaterialPreviewBox::~MaterialPreviewBox() {
-    delete renderTexture;
-    previewScene->rootEntity.setOwnsChildrenRecursive(true);
-    delete previewScene;
+	delete renderTexture;
+	previewScene->rootEntity.setOwnsChildrenRecursive(true);
+	delete previewScene;
 }
 
-void MaterialPreviewBox::setMaterial(Material *material) {
+void MaterialPreviewBox::setMaterial(std::shared_ptr<Material> material) {
 	currentMaterial = material;
 	previewPrimitive->setMaterial(material);	
 	
@@ -803,7 +808,7 @@ void MaterialPreviewBox::showPrimitive(unsigned int index) {
 	for(int i=0; i < shapePrimitives.size(); i++) {
 		shapePrimitives[i]->visible = false;	
 	}
-	shapePrimitives[index]->visible = true;	
+	shapePrimitives[index]->visible = true; 
 	
 	shapeSelector->setPosition(270 - 2, 10 + ((25 * index) - 2));
 	
@@ -827,7 +832,7 @@ void MaterialPreviewBox::handleEvent(Event *event) {
 MaterialPreviewProp::MaterialPreviewProp() : PropProp("", "") {
 	previewBox = new MaterialPreviewBox();
 	propContents->addChild(previewBox);		
-	setHeight(300);	
+	setHeight(300); 
 }
 
 void MaterialPreviewProp::setPropWidth(Number width) {
@@ -841,7 +846,7 @@ MaterialEditorPane::MaterialEditorPane() : UIElement() {
 	headerBg = new UIRect(10,10);
 	addChild(headerBg);
 	headerBg->setAnchorPoint(-1.0, -1.0, 0.0);
-	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor"));	
+	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor")); 
 	
 	
 	propList = new PropList("MATERIAL EDITOR");
@@ -851,9 +856,9 @@ MaterialEditorPane::MaterialEditorPane() : UIElement() {
 	PropSheet *previewProps = new PropSheet("MATERIAL PREVIEW", "");
 	propList->addPropSheet(previewProps);
 	MaterialPreviewProp *materialPreviewProp = new MaterialPreviewProp();
-	previewProps->addProp(materialPreviewProp);	
+	previewProps->addProp(materialPreviewProp); 
 	materialPreview = materialPreviewProp->previewBox;
-	previewProps->propHeight = 300;	
+	previewProps->propHeight = 300; 
 
 	PropSheet *baseProps = new PropSheet("MATERIAL SETTINGS", "");
 	propList->addPropSheet(baseProps);
@@ -889,7 +894,7 @@ MaterialEditorPane::MaterialEditorPane() : UIElement() {
 	Config *conf = CoreServices::getInstance()->getConfig();	
 	String fontName = conf->getStringValue("Polycode", "uiDefaultFontName");	
 				
-	currentMaterial = NULL;	
+	currentMaterial = NULL; 
 	
 	reloadShaders();
 	
@@ -897,15 +902,17 @@ MaterialEditorPane::MaterialEditorPane() : UIElement() {
 }
 
 void MaterialEditorPane::reloadShaders() {
-
 	shaderProp->comboEntry->clearItems();
-
-	MaterialManager *materialManager = CoreServices::getInstance()->getMaterialManager();
-	for(int i=0; i < materialManager->getNumShaders(); i++) {
-		if(!materialManager->getShaderByIndex(i)->screenShader) {
-			shaderProp->comboEntry->addComboItem(materialManager->getShaderByIndex(i)->getName(), (void*)materialManager->getShaderByIndex(i));
+	
+	ResourcePool *globalPool = Services()->getResourceManager()->getGlobalPool();
+	std::vector<std::shared_ptr<Resource> > shaderResources = globalPool->getResources(Resource::RESOURCE_SHADER);
+	
+	for(auto resource:shaderResources) {
+		std::shared_ptr<Shader> shader = std::static_pointer_cast<Shader>(resource);
+		if(!shader->screenShader) {
+			shaderProp->comboEntry->addComboItemWithSharedData(shader->getName(), shader);
 		}
-	}	
+	}
 }
 
 void MaterialEditorPane::Resize(Number width, Number height) {
@@ -916,7 +923,7 @@ void MaterialEditorPane::Resize(Number width, Number height) {
 
 void MaterialEditorPane::handleEvent(Event *event) {
 
-	if(event->getDispatcher() == currentMaterial) {
+	if(event->getDispatcher() == &*currentMaterial) {
 		shaderOptionsSheet->setShader(currentMaterial->getShader(0), currentMaterial, currentMaterial->getShaderBinding(0));
 	}
 
@@ -931,23 +938,27 @@ void MaterialEditorPane::handleEvent(Event *event) {
 			dispatchEvent(new Event(), Event::CHANGE_EVENT);
 		}
 	} else if(event->getDispatcher() == nameProp) {
-		currentMaterial->setName(nameProp->get());        
+		currentMaterial->setName(nameProp->get());		  
 		if(!changingMaterial) {
 			dispatchEvent(new Event(), Event::CHANGE_EVENT);
 		}
 	} else if(event->getDispatcher() == shaderProp) {
-		Shader *selectedShader = (Shader*)shaderProp->comboEntry->getSelectedItem()->data;
+		
+		std::shared_ptr<Shader> selectedShader = std::static_pointer_cast<Shader>(shaderProp->comboEntry->getSelectedItem()->sharedData);
 		if(selectedShader) {			
 			if(currentMaterial->getShader(0) != selectedShader) {
 				currentMaterial->clearShaders();
 				materialPreview->clearMaterial();
 				
-                ShaderBinding *newShaderBinding = new ShaderBinding();
-				currentMaterial->addShader(selectedShader, newShaderBinding);
+				std::shared_ptr<ShaderBinding> newShaderBinding = std::make_shared<ShaderBinding>();
+				ShaderPass newPass;
+				newPass.shader = selectedShader;
+				newPass.shaderBinding = newShaderBinding;
+				currentMaterial->addShaderPass(newPass);
 				materialPreview->setMaterial(currentMaterial);					
 			}
 			
-            shaderOptionsSheet->setShader(selectedShader, currentMaterial, currentMaterial->getShaderBinding(0));
+			shaderOptionsSheet->setShader(selectedShader, currentMaterial, currentMaterial->getShaderBinding(0));
 		}
 		
 		if(!changingMaterial) {
@@ -957,16 +968,16 @@ void MaterialEditorPane::handleEvent(Event *event) {
 }
 
 void MaterialEditorPane::Activate() {
-    materialPreview->previewScene->enabled = true;
-    materialPreview->renderTexture->enabled = true;
+	materialPreview->previewScene->enabled = true;
+	materialPreview->renderTexture->enabled = true;
 }
 
 void MaterialEditorPane::Deactivate() {
-    materialPreview->previewScene->enabled = false;
-    materialPreview->renderTexture->enabled = false;
+	materialPreview->previewScene->enabled = false;
+	materialPreview->renderTexture->enabled = false;
 }
 
-void MaterialEditorPane::setMaterial(Material *material) {
+void MaterialEditorPane::setMaterial(std::shared_ptr<Material> material) {
 	changingMaterial = true;
 	
 	if(currentMaterial) {
@@ -985,9 +996,9 @@ void MaterialEditorPane::setMaterial(Material *material) {
 	
 	blendModeProp->set(currentMaterial->blendingMode);
 	
-	if(currentMaterial->getShader(0)) {	
+	if(currentMaterial->getShader(0)) { 
 	for(int i=0; i < shaderProp->comboEntry->getNumItems(); i++) {
-		Shader *shader = (Shader*)shaderProp->comboEntry->getItemAtIndex(i)->data;
+		std::shared_ptr<Shader> shader = std::static_pointer_cast<Shader>(shaderProp->comboEntry->getItemAtIndex(i)->sharedData);
 		if(shader) {
 			if(currentMaterial->getShader(0)->getName() == shader->getName()) {
 				shaderProp->set(i);
@@ -1018,9 +1029,9 @@ MaterialMainWindow::MaterialMainWindow(ResourcePool *resourcePool) : UIElement()
 	shaderPane = new ShaderEditorPane(resourcePool);
 	cubemapPane = new CubemapEditorPane(resourcePool);
 	postPane = new PostEditorPane(resourcePool);
-    
-    ownsChildren = true;
-    
+	
+	ownsChildren = true;
+	
 	addChild(materialPane);
 	addChild(shaderPane);	
 	addChild(cubemapPane);
@@ -1028,22 +1039,22 @@ MaterialMainWindow::MaterialMainWindow(ResourcePool *resourcePool) : UIElement()
 }
 
 void MaterialMainWindow::Activate() {
-    materialPane->Activate();
-    cubemapPane->Activate();
-    cubemapPane->Activate();
+	materialPane->Activate();
+	cubemapPane->Activate();
+	cubemapPane->Activate();
 }
 
 void MaterialMainWindow::Deactivate() {
-    materialPane->Deactivate();
-    cubemapPane->Deactivate();
-    cubemapPane->Deactivate();
+	materialPane->Deactivate();
+	cubemapPane->Deactivate();
+	cubemapPane->Deactivate();
 }
 
 MaterialMainWindow::~MaterialMainWindow() {
 }
 	
 void MaterialMainWindow::Resize(Number width, Number height) {	
-	Vector2 pos = getScreenPositionForMainCamera();	
+	Vector2 pos = getScreenPositionForMainCamera(); 
 	scissorBox.setRect(pos.x,pos.y,width, height);
 	materialPane->Resize(width, height);
 	shaderPane->Resize(width, height);
@@ -1068,7 +1079,7 @@ MaterialBrowser::MaterialBrowser() : UIElement() {
 	headerBg = new UIRect(10,10);
 	addChild(headerBg);
 	headerBg->setAnchorPoint(-1.0, -1.0, 0.0);
-	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor"));	
+	headerBg->color.setColorHexFromString(CoreServices::getInstance()->getConfig()->getStringValue("Polycode", "uiHeaderBgColor")); 
 
 	newShaderButton = new UIImageButton("materialEditor/new_shader.png", 1.0, 22, 22);
 	addChild(newShaderButton);
@@ -1104,7 +1115,7 @@ void MaterialBrowser::handleEvent(Event *event) {
 		if(event->getEventCode() == UITreeEvent::SELECTED_EVENT){ 
 			selectedNode = treeContainer->getRootNode()->getSelectedNode();			
 			MaterialBrowserData *data = (MaterialBrowserData *)selectedNode->getUserData();
-			selectedData =  data;
+			selectedData =	data;
 			dispatchEvent(new Event(), Event::CHANGE_EVENT);
 		}
 	}	
@@ -1112,25 +1123,25 @@ void MaterialBrowser::handleEvent(Event *event) {
 }
 
 
-UITree *MaterialBrowser::addMaterial(Material *material) {
+UITree *MaterialBrowser::addMaterial(std::shared_ptr<Material> material) {
 	MaterialBrowserData *data = new MaterialBrowserData();
 	data->material = material;
 	return materialsNode->addTreeChild("materialEditor/material_icon.png", material->getName(), (void*)data);
 }
 
-UITree *MaterialBrowser::addShader(Shader *shader) {
+UITree *MaterialBrowser::addShader(std::shared_ptr<Shader> shader) {
 	MaterialBrowserData *data = new MaterialBrowserData();
 	data->shader = shader;
 	return shadersNode->addTreeChild("materialEditor/shader_icon.png", shader->getName(), (void*)data);
 }
 
-UITree *MaterialBrowser::addCubemap(Cubemap *cubemap) {
+UITree *MaterialBrowser::addCubemap(std::shared_ptr<Cubemap> cubemap) {
 	MaterialBrowserData *data = new MaterialBrowserData();
 	data->cubemap = cubemap;
 	return cubemapsNode->addTreeChild("materialEditor/cubemap_icon.png", cubemap->getResourceName(), (void*)data);
 }
 
-UITree *MaterialBrowser::addPostMaterial(Material *material) {
+UITree *MaterialBrowser::addPostMaterial(std::shared_ptr<Material> material) {
 	MaterialBrowserData *data = new MaterialBrowserData();
 	data->postMaterial = material;
 	return postEffectsNode->addTreeChild("materialEditor/screenshader_icon.png", material->getName(), (void*)data);
@@ -1148,43 +1159,43 @@ void MaterialBrowser::Resize(Number width, Number height) {
 }
 
 PolycodeMaterialEditor::PolycodeMaterialEditor() : PolycodeEditor(true){
-    
-    
+	
+	
 	selectedMaterialNode = NULL;
 }
 
 void PolycodeMaterialEditor::Activate() {
-    mainWindow->Activate();
+	mainWindow->Activate();
 }
 
 void PolycodeMaterialEditor::Deactivate() {
-    mainWindow->Deactivate();
+	mainWindow->Deactivate();
 }
 
 PolycodeMaterialEditor::~PolycodeMaterialEditor() {
-    CoreServices::getInstance()->getResourceManager()->unsubscibeFromResourcePool(resourcePool);
-    
-    mainWindow->setOwnsChildrenRecursive(true);
-    delete mainWindow;
-    delete mainSizer;
-    delete materialBrowser;
+	CoreServices::getInstance()->getResourceManager()->unsubscibeFromResourcePool(resourcePool);
+	
+	mainWindow->setOwnsChildrenRecursive(true);
+	delete mainWindow;
+	delete mainSizer;
+	delete materialBrowser;
 }
 
 bool PolycodeMaterialEditor::openFile(OSFileEntry filePath) {
 	
-    String resourceName = filePath.fullPath.replace(parentProject->getRootFolder()+"/", "");
-    
-    resourcePool = CoreServices::getInstance()->getResourceManager()->getResourcePoolByName(resourceName);
-    
-    if(!resourcePool) {
-        resourcePool = new ResourcePool(resourceName,  CoreServices::getInstance()->getResourceManager()->getGlobalPool());
-        resourcePool->reloadResourcesOnModify = true;
-        resourcePool->deleteOnUnsubscribe = true;
-        CoreServices::getInstance()->getMaterialManager()->loadMaterialLibraryIntoPool(resourcePool, filePath.fullPath);
-        CoreServices::getInstance()->getResourceManager()->addResourcePool(resourcePool);
-    }
-    
-    CoreServices::getInstance()->getResourceManager()->subscribeToResourcePool(resourcePool);
+	String resourceName = filePath.fullPath.replace(parentProject->getRootFolder()+"/", "");
+	
+	resourcePool = CoreServices::getInstance()->getResourceManager()->getResourcePoolByName(resourceName);
+	
+	if(!resourcePool) {
+		resourcePool = new ResourcePool(resourceName,  CoreServices::getInstance()->getResourceManager()->getGlobalPool());
+		resourcePool->reloadResourcesOnModify = true;
+		resourcePool->deleteOnUnsubscribe = true;
+		resourcePool->loadResourcesFromMaterialFile(filePath.fullPath);
+		CoreServices::getInstance()->getResourceManager()->addResourcePool(resourcePool);
+	}
+	
+	CoreServices::getInstance()->getResourceManager()->subscribeToResourcePool(resourcePool);
 		
 	mainSizer = new UIHSizer(100,100,200,false);
 	addChild(mainSizer);	
@@ -1194,33 +1205,33 @@ bool PolycodeMaterialEditor::openFile(OSFileEntry filePath) {
 	
 	materialBrowser->addEventListener(this, Event::CHANGE_EVENT);
 	
-    std::vector<Resource*> res = resourcePool->getResources(Resource::RESOURCE_SHADER);
-    for(int i=0; i < res.size(); i++) {
-        Shader *shader = (Shader*)res[i];
+	std::vector<std::shared_ptr<Resource> > res = resourcePool->getResources(Resource::RESOURCE_SHADER);
+	for(int i=0; i < res.size(); i++) {
+		std::shared_ptr<Shader> shader = std::static_pointer_cast<Shader>(res[i]);
 		materialBrowser->addShader(shader);
 		shader->vertexProgram->reloadOnFileModify = true;
 		shader->fragmentProgram->reloadOnFileModify = true;
-        shaders.push_back(shader);
-    }
-    
-    res = resourcePool->getResources(Resource::RESOURCE_CUBEMAP);
-    for(int i=0; i < res.size(); i++) {
-        Cubemap *cubemap = (Cubemap*)res[i];
+		shaders.push_back(shader);
+	}
+	
+	res = resourcePool->getResources(Resource::RESOURCE_CUBEMAP);
+	for(int i=0; i < res.size(); i++) {
+		std::shared_ptr<Cubemap> cubemap = std::static_pointer_cast<Cubemap>(res[i]);
 		materialBrowser->addCubemap(cubemap);
-        cubemaps.push_back(cubemap);
-    }
-    
-    res = resourcePool->getResources(Resource::RESOURCE_MATERIAL);
-    for(int i=0; i < res.size(); i++) {
-        Material *material = (Material*)res[i];
+		cubemaps.push_back(cubemap);
+	}
+	
+	res = resourcePool->getResources(Resource::RESOURCE_MATERIAL);
+	for(int i=0; i < res.size(); i++) {
+		std::shared_ptr<Material> material = std::static_pointer_cast<Material>(res[i]);
 		if(material->screenMaterial) {
 			postMaterials.push_back(material);
-            materialBrowser->addPostMaterial(material);
+			materialBrowser->addPostMaterial(material);
 		} else {
 			materials.push_back(material);
-            materialBrowser->addMaterial(material);
+			materialBrowser->addMaterial(material);
 		}
-    }
+	}
 	
 	mainWindow = new MaterialMainWindow(resourcePool);
 	mainSizer->addLeftChild(mainWindow);
@@ -1269,20 +1280,20 @@ String PolycodeMaterialEditor::createStringValue(unsigned int type, void *value)
 			retString = String::NumberToString(vec.x) + " " + String::NumberToString(vec.y) + " " + String::NumberToString(vec.z);
 		}
 		break;
-        case ProgramParam::PARAM_TEXTURE:
-        {
-            Texture *tex = (Texture*) value;
-            retString = tex->getResourcePath();
-        }
-        break;
+		case ProgramParam::PARAM_TEXTURE:
+		{
+			Texture *tex = (Texture*) value;
+			retString = tex->getResourcePath();
+		}
+		break;
 	}
 	
 	return retString;
 }
 
-void PolycodeMaterialEditor::saveMaterials(ObjectEntry *materialsEntry, std::vector<Material*> materials) {
+void PolycodeMaterialEditor::saveMaterials(ObjectEntry *materialsEntry, std::vector<std::shared_ptr<Material> > materials) {
 	for(int i=0; i < materials.size(); i++) {
-		Material *material = materials[i];				
+		std::shared_ptr<Material> material = materials[i];				
 		
 		ObjectEntry *materialEntry = materialsEntry->addChild("material");
 		materialEntry->addChild("name", material->getName());
@@ -1322,13 +1333,13 @@ void PolycodeMaterialEditor::saveMaterials(ObjectEntry *materialsEntry, std::vec
 		
 		if(material->getNumShaderPasses() > 0) {
 			for(int s=0; s < material->getNumShaderPasses(); s++) {
-				Shader *shader = material->getShader(s);
+				std::shared_ptr<Shader> shader = material->getShader(s);
 				
 				ObjectEntry *shaderEntry = materialEntry->addChild("shader");
 				shaderEntry->addChild("name", shader->getName());		
 				ObjectEntry *texturesEntry = shaderEntry->addChild("textures");
 				
-				ShaderBinding *shaderBinding = material->getShaderBinding(s);
+				std::shared_ptr<ShaderBinding> shaderBinding = material->getShaderPass(s).shaderBinding;
 				
 				if(material->screenMaterial) {
 					if(shaderBinding->getNumRenderTargetBindings() > 0) {
@@ -1359,38 +1370,6 @@ void PolycodeMaterialEditor::saveMaterials(ObjectEntry *materialsEntry, std::vec
 						}
 					}
 				}
-				
-                // RENDERER_TODO
-                /*
-				for(int j=0; j < shader->expectedTextures.size(); j++) {
-					Texture *texture = shaderBinding->getTexture(shader->expectedTextures[j]);
-					
-					bool inRenderBinding = false;
-					
-					for(int b=0; b < shaderBinding->getNumRenderTargetBindings(); b++) {
-						RenderTargetBinding *_binding = shaderBinding->getRenderTargetBinding(b);
-						if(_binding->name == shader->expectedTextures[j]) {
-							inRenderBinding = true;
-						}
-					}
-					
-					if(texture && !inRenderBinding) {
-						String texturePath = texture->getResourcePath();
-						texturePath = texturePath.replace(parentProject->getRootFolder()+"/", "");				
-						ObjectEntry *textureEntry = texturesEntry->addChild("texture", texturePath);
-						textureEntry->addChild("name", shader->expectedTextures[j]);
-					}
-				}
-				
-				for(int j=0; j < shader->expectedCubemaps.size(); j++) {
-					Cubemap *cubemap = shaderBinding->getCubemap(shader->expectedCubemaps[j]);
-					if(cubemap) {
-						String cubemapName = cubemap->getResourceName();
-						ObjectEntry *cubemapEntry = texturesEntry->addChild("cubemap", cubemapName);
-						cubemapEntry->addChild("name", shader->expectedCubemaps[j]);
-					}
-				}
-				*/
 				
 				if(shader->expectedParams.size() > 0 || shader->expectedParams.size() > 0) {
 					ObjectEntry *paramsEntry = shaderEntry->addChild("params");
@@ -1486,8 +1465,9 @@ void PolycodeMaterialEditor::handleEvent(Event *event) {
 	}
 
 	if(event->getDispatcher() == materialBrowser->newPostButton && event->getEventType() == "UIEvent" && event->getEventCode() == UIEvent::CLICK_EVENT) {
-	
-		Material *newMaterial = CoreServices::getInstance()->getMaterialManager()->createMaterial(resourcePool, "PostEffect"+String::IntToString(postMaterials.size()), "PassThrough");
+		
+		std::shared_ptr<Material> newMaterial = std::make_shared<Material>("PostEffect"+String::IntToString(postMaterials.size()));
+			resourcePool->addResource(newMaterial);
 			newMaterial->screenMaterial = true;
 			materialBrowser->addPostMaterial(newMaterial)->setSelected();
 			postMaterials.push_back(newMaterial);
@@ -1495,7 +1475,8 @@ void PolycodeMaterialEditor::handleEvent(Event *event) {
 	}	
 
 	if(event->getDispatcher() == materialBrowser->newMaterialButton && event->getEventType() == "UIEvent" && event->getEventCode() == UIEvent::CLICK_EVENT) {
-		Material *newMaterial = CoreServices::getInstance()->getMaterialManager()->createMaterial(resourcePool, "Untitled", "DefaultShader");
+			std::shared_ptr<Material> newMaterial = std::make_shared<Material>("Untitled");
+			resourcePool->addResource(newMaterial);
 			materialBrowser->addMaterial(newMaterial)->setSelected();
 			resourcePool->addResource(newMaterial);
 			materials.push_back(newMaterial);
@@ -1503,25 +1484,31 @@ void PolycodeMaterialEditor::handleEvent(Event *event) {
 	}	
 
 	if(event->getDispatcher() == materialBrowser->newShaderButton && event->getEventType() == "UIEvent" && event->getEventCode() == UIEvent::CLICK_EVENT) {
-			Shader *newShader = CoreServices::getInstance()->getMaterialManager()->createShader(resourcePool, "glsl", "Untitled", "default/Unlit.vert", "default/Unlit.frag", false);
-			if(newShader) {
-				materialBrowser->addShader(newShader)->setSelected();
-				shaders.push_back(newShader);
-				CoreServices::getInstance()->getMaterialManager()->addShader(newShader);
-				setHasChanges(true);	
-			} else {
-				printf("Error creating shader!\n");
-			}
+		
+		ResourcePool *globalPool = Services()->getResourceManager()->getGlobalPool();
+		std::shared_ptr<ShaderProgram> vertexProgram = std::static_pointer_cast<ShaderProgram>(globalPool->getResourceByPath("default/Unlit.vert"));
+		std::shared_ptr<ShaderProgram> fragmentProgram = std::static_pointer_cast<ShaderProgram>(globalPool->getResourceByPath("default/Unlit.frag"));
+		
+		
+		std::shared_ptr<Shader> newShader = std::make_shared<Shader>(vertexProgram, fragmentProgram);
+		newShader->setName("Untitled");
+		
+		resourcePool->addResource(newShader);
+		if(newShader) {
+			materialBrowser->addShader(newShader)->setSelected();
+			shaders.push_back(newShader);
+			setHasChanges(true);
+		} else {
+			printf("Error creating shader!\n");
+		}
 	}	
 
-	if(event->getDispatcher() == materialBrowser->newCubemapButton && event->getEventType() == "UIEvent" && event->getEventCode() == UIEvent::CLICK_EVENT) {	
-		Cubemap *cubemap = CoreServices::getInstance()->getRenderer()->createCubemap(
-							 (Texture*)resourcePool->getResource(Resource::RESOURCE_TEXTURE, "default.png"),
-							 (Texture*)resourcePool->getResource(Resource::RESOURCE_TEXTURE, "default.png"),
-							 (Texture*)resourcePool->getResource(Resource::RESOURCE_TEXTURE, "default.png"),
-							 (Texture*)resourcePool->getResource(Resource::RESOURCE_TEXTURE, "default.png"),
-							 (Texture*)resourcePool->getResource(Resource::RESOURCE_TEXTURE, "default.png"),
-							 (Texture*)resourcePool->getResource(Resource::RESOURCE_TEXTURE, "default.png"));
+	if(event->getDispatcher() == materialBrowser->newCubemapButton && event->getEventType() == "UIEvent" && event->getEventCode() == UIEvent::CLICK_EVENT) {
+		
+		ResourcePool *globalPool = Services()->getResourceManager()->getGlobalPool();
+		std::shared_ptr<Texture> texture = std::static_pointer_cast<Texture>(globalPool->getResource(Resource::RESOURCE_SHADER, "default.png"));
+		
+		std::shared_ptr<Cubemap> cubemap = std::make_shared<Cubemap>(texture, texture, texture, texture, texture, texture);
 		cubemap->setResourceName("Cubemap"+String::IntToString(cubemaps.size()));
 		cubemaps.push_back(cubemap);
 		materialBrowser->addCubemap(cubemap)->setSelected();

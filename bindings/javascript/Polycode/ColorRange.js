@@ -1,12 +1,17 @@
-function ColorRange() {
+function ColorRange(color,rangeStart,rangeEnd) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.ColorRange(color,rangeStart,rangeEnd)
+	}
 	Object.defineProperties(this, {
 		'color': { enumerable: true, configurable: true, get: ColorRange.prototype.__get_color, set: ColorRange.prototype.__set_color},
 		'rangeStart': { enumerable: true, configurable: true, get: ColorRange.prototype.__get_rangeStart, set: ColorRange.prototype.__set_rangeStart},
 		'rangeEnd': { enumerable: true, configurable: true, get: ColorRange.prototype.__get_rangeEnd, set: ColorRange.prototype.__set_rangeEnd}
 	})
 }
+
+
 ColorRange.prototype.__get_color = function() {
-	var retVal = new Color()
+	var retVal = new Color("__skip_ptr__")
 	retVal.__ptr = 	Polycode.ColorRange__get_color(this.__ptr)
 	return retVal
 }

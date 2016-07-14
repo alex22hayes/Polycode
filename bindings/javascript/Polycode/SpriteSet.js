@@ -1,5 +1,14 @@
+require('Polycode/ResourcePool')
+
 function SpriteSet() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.SpriteSet()
+	}
 }
+
+
+SpriteSet.prototype = Object.create(ResourcePool.prototype)
+
 Duktape.fin(SpriteSet.prototype, function (x) {
 	if (x === SpriteSet.prototype) {
 		return;
@@ -12,14 +21,8 @@ SpriteSet.prototype.setTexture = function(texture) {
 }
 
 SpriteSet.prototype.getTexture = function() {
-	var retVal = new Texture()
+	var retVal = new Texture("__skip_ptr__")
 	retVal.__ptr = Polycode.SpriteSet_getTexture(this.__ptr)
-	return retVal
-}
-
-SpriteSet.prototype.loadTexture = function(imageFileName) {
-	var retVal = new Texture()
-	retVal.__ptr = Polycode.SpriteSet_loadTexture(this.__ptr, imageFileName)
 	return retVal
 }
 
@@ -32,7 +35,7 @@ SpriteSet.prototype.getNumSpriteEntries = function() {
 }
 
 SpriteSet.prototype.getSpriteEntry = function(index) {
-	var retVal = new Sprite()
+	var retVal = new Sprite("__skip_ptr__")
 	retVal.__ptr = Polycode.SpriteSet_getSpriteEntry(this.__ptr, index)
 	return retVal
 }
@@ -46,7 +49,7 @@ SpriteSet.prototype.loadSpriteSet = function(fileName) {
 }
 
 SpriteSet.prototype.addSpriteFrame = function(frame,assignID) {
-	Polycode.SpriteSet_addSpriteFrame(this.__ptr, frame,assignID)
+	Polycode.SpriteSet_addSpriteFrame(this.__ptr, frame, assignID)
 }
 
 SpriteSet.prototype.getNumFrames = function() {
@@ -54,13 +57,13 @@ SpriteSet.prototype.getNumFrames = function() {
 }
 
 SpriteSet.prototype.getSpriteFrame = function(index) {
-	var retVal = new SpriteFrame()
+	var retVal = new SpriteFrame("__skip_ptr__")
 	retVal.__ptr = Polycode.SpriteSet_getSpriteFrame(this.__ptr, index)
 	return retVal
 }
 
 SpriteSet.prototype.getSpriteFrameByID = function(frameID) {
-	var retVal = new SpriteFrame()
+	var retVal = new SpriteFrame("__skip_ptr__")
 	retVal.__ptr = Polycode.SpriteSet_getSpriteFrameByID(this.__ptr, frameID)
 	return retVal
 }
@@ -78,15 +81,15 @@ SpriteSet.prototype.clearFrames = function() {
 }
 
 SpriteSet.prototype.createGridFrames = function(xCount,yCount,defaultAnchor) {
-	Polycode.SpriteSet_createGridFrames(this.__ptr, xCount,yCount,defaultAnchor)
+	Polycode.SpriteSet_createGridFrames(this.__ptr, xCount, yCount, defaultAnchor)
 }
 
 SpriteSet.prototype.createFramesFromIslands = function(minDistance,defaultAnchor) {
-	Polycode.SpriteSet_createFramesFromIslands(this.__ptr, minDistance,defaultAnchor)
+	Polycode.SpriteSet_createFramesFromIslands(this.__ptr, minDistance, defaultAnchor)
 }
 
 SpriteSet.prototype.getSpriteByName = function(spriteName) {
-	var retVal = new Sprite()
+	var retVal = new Sprite("__skip_ptr__")
 	retVal.__ptr = Polycode.SpriteSet_getSpriteByName(this.__ptr, spriteName)
 	return retVal
 }

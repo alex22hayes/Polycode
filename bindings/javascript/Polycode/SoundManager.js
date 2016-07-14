@@ -1,5 +1,10 @@
 function SoundManager() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.SoundManager()
+	}
 }
+
+
 Duktape.fin(SoundManager.prototype, function (x) {
 	if (x === SoundManager.prototype) {
 		return;
@@ -16,17 +21,7 @@ SoundManager.prototype.setListenerOrientation = function(orientation) {
 }
 
 SoundManager.prototype.recordSound = function(rate,sampleSize) {
-	return Polycode.SoundManager_recordSound(this.__ptr, rate,sampleSize)
-}
-
-SoundManager.prototype.stopRecording = function(generateFloatBuffer) {
-	var retVal = new Sound()
-	retVal.__ptr = Polycode.SoundManager_stopRecording(this.__ptr, generateFloatBuffer)
-	return retVal
-}
-
-SoundManager.prototype.setAudioInterface = function(audioInterface) {
-	Polycode.SoundManager_setAudioInterface(this.__ptr, audioInterface)
+	return Polycode.SoundManager_recordSound(this.__ptr, rate, sampleSize)
 }
 
 SoundManager.prototype.Update = function() {
@@ -35,12 +30,4 @@ SoundManager.prototype.Update = function() {
 
 SoundManager.prototype.setGlobalVolume = function(globalVolume) {
 	Polycode.SoundManager_setGlobalVolume(this.__ptr, globalVolume)
-}
-
-SoundManager.prototype.registerSound = function(sound) {
-	Polycode.SoundManager_registerSound(this.__ptr, sound)
-}
-
-SoundManager.prototype.unregisterSound = function(sound) {
-	Polycode.SoundManager_unregisterSound(this.__ptr, sound)
 }

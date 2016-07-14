@@ -24,6 +24,9 @@
 #include "polycode/core/PolyGlobals.h"
 #include <iomanip>
 #include <sstream>
+#ifdef _WINDOWS
+	#include <ctype.h>
+#endif
 
 using namespace Polycode;
 using namespace std;
@@ -113,15 +116,17 @@ void String::setDataWithEncoding(char *data, int encoding) {
 	}
 }
 
-bool String::isNumber() {
-#if PLATFORM == PLATFORM_WINDOWS
+bool String::isNumber(){
+	if (contents.find_first_not_of("0123456789.+-") == string::npos)
+		return true;
 	return false;
-#else
-    std::string::const_iterator it = contents.begin();
-    while (it != contents.end() && std::isdigit(*it)) ++it;
-    return !contents.empty() && it == contents.end();
-#endif
-}				
+}
+
+bool String::isInteger() {
+	std::string::const_iterator it = contents.begin();
+	while (it != contents.end() && (isdigit(*it) || *it == '+' || *it == '-')) ++it;
+	return !contents.empty() && it == contents.end();
+}
 
 
 
@@ -159,11 +164,11 @@ vector<String> String::split(const String &delim) const {
 }
 
 Number String::toNumber() {
-    return atof(contents.c_str());
+	return atof(contents.c_str());
 }
 
 int String::toInteger() {
-    return atoi(contents.c_str());
+	return atoi(contents.c_str());
 }
 
 String String::replace(const String &what, const String &withWhat) const {
@@ -191,9 +196,9 @@ String String::toUpperCase() const {
 
 
 String String::NumberToString(Number value, int precision) {
-    stringstream ss;
-    ss << fixed << setprecision(precision) << value;
-    return String(ss.str());
+	stringstream ss;
+	ss << fixed << setprecision(precision) << value;
+	return String(ss.str());
 }
 
 String String::IntToString(int value) {

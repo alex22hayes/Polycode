@@ -1,10 +1,15 @@
+require('Polycode/Event')
+
 function InputEvent() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.InputEvent()
+	}
 	Object.defineProperties(this, {
 		'mouseButton': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_mouseButton, set: InputEvent.prototype.__set_mouseButton},
 		'mousePosition': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_mousePosition, set: InputEvent.prototype.__set_mousePosition},
 		'key': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_key, set: InputEvent.prototype.__set_key},
-		'charCode': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_charCode, set: InputEvent.prototype.__set_charCode},
 		'timestamp': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_timestamp, set: InputEvent.prototype.__set_timestamp},
+		'text': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_text, set: InputEvent.prototype.__set_text},
 		'touch': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_touch, set: InputEvent.prototype.__set_touch},
 		'touchType': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_touchType, set: InputEvent.prototype.__set_touchType},
 		'joystickDeviceID': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_joystickDeviceID, set: InputEvent.prototype.__set_joystickDeviceID},
@@ -15,6 +20,31 @@ function InputEvent() {
 		'hitDistance': { enumerable: true, configurable: true, get: InputEvent.prototype.__get_hitDistance, set: InputEvent.prototype.__set_hitDistance}
 	})
 }
+
+InputEvent.EVENTBASE_INPUTEVENT = 0x400
+InputEvent.EVENT_MOUSEDOWN = EVENTBASE_INPUTEVENT + 0
+InputEvent.EVENT_MOUSEUP = EVENTBASE_INPUTEVENT + 1
+InputEvent.EVENT_MOUSEMOVE = EVENTBASE_INPUTEVENT + 2
+InputEvent.EVENT_MOUSEOVER = EVENTBASE_INPUTEVENT + 3
+InputEvent.EVENT_MOUSEOUT = EVENTBASE_INPUTEVENT + 4
+InputEvent.EVENT_DOUBLECLICK = EVENTBASE_INPUTEVENT + 5
+InputEvent.EVENT_MOUSEUP_OUTSIDE = EVENTBASE_INPUTEVENT + 6
+InputEvent.EVENT_MOUSEWHEEL_UP = EVENTBASE_INPUTEVENT + 7
+InputEvent.EVENT_MOUSEWHEEL_DOWN = EVENTBASE_INPUTEVENT + 8
+InputEvent.EVENT_KEYDOWN = EVENTBASE_INPUTEVENT + 13
+InputEvent.EVENT_KEYUP = EVENTBASE_INPUTEVENT + 14
+InputEvent.EVENT_JOYBUTTON_DOWN = EVENTBASE_INPUTEVENT + 15
+InputEvent.EVENT_JOYBUTTON_UP = EVENTBASE_INPUTEVENT + 16
+InputEvent.EVENT_JOYAXIS_MOVED = EVENTBASE_INPUTEVENT + 17
+InputEvent.EVENT_JOYDEVICE_ATTACHED = EVENTBASE_INPUTEVENT + 18
+InputEvent.EVENT_JOYDEVICE_DETACHED = EVENTBASE_INPUTEVENT + 19
+InputEvent.EVENT_TOUCHES_BEGAN = EVENTBASE_INPUTEVENT + 20
+InputEvent.EVENT_TOUCHES_MOVED = EVENTBASE_INPUTEVENT + 21
+InputEvent.EVENT_TOUCHES_ENDED = EVENTBASE_INPUTEVENT + 22
+InputEvent.EVENT_TEXTINPUT = EVENTBASE_INPUTEVENT + 23
+
+InputEvent.prototype = Object.create(Event.prototype)
+
 InputEvent.prototype.__get_mouseButton = function() {
 	return Polycode.InputEvent__get_mouseButton(this.__ptr)
 }
@@ -24,7 +54,7 @@ InputEvent.prototype.__set_mouseButton = function(val) {
 }
 
 InputEvent.prototype.__get_mousePosition = function() {
-	var retVal = new Vector2()
+	var retVal = new Vector2("__skip_ptr__")
 	retVal.__ptr = 	Polycode.InputEvent__get_mousePosition(this.__ptr)
 	return retVal
 }
@@ -41,16 +71,6 @@ InputEvent.prototype.__set_key = function(val) {
 	Polycode.InputEvent__set_key(this.__ptr, val)
 }
 
-InputEvent.prototype.__get_charCode = function() {
-	var retVal = new wchar_t()
-	retVal.__ptr = 	Polycode.InputEvent__get_charCode(this.__ptr)
-	return retVal
-}
-
-InputEvent.prototype.__set_charCode = function(val) {
-	Polycode.InputEvent__set_charCode(this.__ptr, val.__ptr)
-}
-
 InputEvent.prototype.__get_timestamp = function() {
 	return Polycode.InputEvent__get_timestamp(this.__ptr)
 }
@@ -59,8 +79,16 @@ InputEvent.prototype.__set_timestamp = function(val) {
 	Polycode.InputEvent__set_timestamp(this.__ptr, val)
 }
 
+InputEvent.prototype.__get_text = function() {
+	return Polycode.InputEvent__get_text(this.__ptr)
+}
+
+InputEvent.prototype.__set_text = function(val) {
+	Polycode.InputEvent__set_text(this.__ptr, val)
+}
+
 InputEvent.prototype.__get_touch = function() {
-	var retVal = new TouchInfo()
+	var retVal = new TouchInfo("__skip_ptr__")
 	retVal.__ptr = 	Polycode.InputEvent__get_touch(this.__ptr)
 	return retVal
 }
@@ -133,7 +161,7 @@ Duktape.fin(InputEvent.prototype, function (x) {
 })
 
 InputEvent.prototype.getMousePosition = function() {
-	var retVal = new Vector2()
+	var retVal = new Vector2("__skip_ptr__")
 	retVal.__ptr = Polycode.InputEvent_getMousePosition(this.__ptr)
 	return retVal
 }
@@ -144,12 +172,6 @@ InputEvent.prototype.getKey = function() {
 
 InputEvent.prototype.getMouseButton = function() {
 	return Polycode.InputEvent_getMouseButton(this.__ptr)
-}
-
-InputEvent.prototype.getCharCode = function() {
-	var retVal = new wchar_t()
-	retVal.__ptr = Polycode.InputEvent_getCharCode(this.__ptr)
-	return retVal
 }
 
 InputEvent.prototype.keyCode = function() {

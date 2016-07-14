@@ -38,7 +38,7 @@ namespace Polycode {
 		/**
 		* Default constructor
 		*/
-        ObjectEntry();
+		ObjectEntry();
 				
 		/**
 		* Type of entry. Possible values are (FLOAT_ENTRY, INT_ENTRY, BOOL_ENTRY, ARRAY_ENTRY, STRING_ENTRY, CONTAINER_ENTRY).
@@ -331,6 +331,8 @@ namespace Polycode {
 		*/				
 		void saveToXML(const String& fileName);
 
+		String saveToXMLString();
+
 		/**
 		* Saves the object to an optimized binary file
 		* @param fileName Path to the file to save to.
@@ -368,7 +370,7 @@ namespace Polycode {
 			
 			bool readFile();
 					
-            Polycode::CoreFile *inFile;
+			Polycode::CoreFile *inFile;
 			std::vector<String> keys;
 			Object *object;		
 

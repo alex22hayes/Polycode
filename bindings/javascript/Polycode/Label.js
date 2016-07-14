@@ -1,5 +1,20 @@
-function Label() {
+require('Polycode/Image')
+
+function Label(font,text,size,antiAliasMode,premultiplyAlpha,backgroundColor,foregroundColor) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.Label(font,text,size,antiAliasMode,premultiplyAlpha,backgroundColor,foregroundColor)
+	}
 }
+
+Label.ANTIALIAS_FULL = 0
+Label.ANTIALIAS_NONE = 1
+Label.ANTIALIAS_STRONG = 2
+Label.ANTIALIAS_LCD = 3
+Label.ANTIALIAS_LCD_HINT = 4
+Label.ANTIALIAS_FULL_HINT = 5
+
+Label.prototype = Object.create(Image.prototype)
+
 Duktape.fin(Label.prototype, function (x) {
 	if (x === Label.prototype) {
 		return;
@@ -32,7 +47,7 @@ Label.prototype.getTextHeight = function() {
 }
 
 Label.prototype.setColorForRange = function(color,rangeStart,rangeEnd) {
-	Polycode.Label_setColorForRange(this.__ptr, color,rangeStart,rangeEnd)
+	Polycode.Label_setColorForRange(this.__ptr, color, rangeStart, rangeEnd)
 }
 
 Label.prototype.clearColors = function() {
@@ -40,7 +55,7 @@ Label.prototype.clearColors = function() {
 }
 
 Label.prototype.getColorForIndex = function(index) {
-	var retVal = new Color()
+	var retVal = new Color("__skip_ptr__")
 	retVal.__ptr = Polycode.Label_getColorForIndex(this.__ptr, index)
 	return retVal
 }
@@ -58,7 +73,7 @@ Label.prototype.setFont = function(newFont) {
 }
 
 Label.prototype.getFont = function() {
-	var retVal = new Font()
+	var retVal = new Font("__skip_ptr__")
 	retVal.__ptr = Polycode.Label_getFont(this.__ptr)
 	return retVal
 }
@@ -92,17 +107,17 @@ Label.prototype.setForegroundColor = function(color) {
 }
 
 Label.prototype.setColors = function(backgroundColor,foregroundColor) {
-	Polycode.Label_setColors(this.__ptr, backgroundColor,foregroundColor)
+	Polycode.Label_setColors(this.__ptr, backgroundColor, foregroundColor)
 }
 
 Label.prototype.getBackgroundColor = function() {
-	var retVal = new Color()
+	var retVal = new Color("__skip_ptr__")
 	retVal.__ptr = Polycode.Label_getBackgroundColor(this.__ptr)
 	return retVal
 }
 
 Label.prototype.getForegroundColor = function() {
-	var retVal = new Color()
+	var retVal = new Color("__skip_ptr__")
 	retVal.__ptr = Polycode.Label_getForegroundColor(this.__ptr)
 	return retVal
 }

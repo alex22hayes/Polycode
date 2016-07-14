@@ -22,36 +22,51 @@
 
 #include "string.h"
 #include "polycode/core/PolyTexture.h"
+#include "polycode/core/PolyImage.h"
+#include "polycode/core/PolyCoreServices.h"
+#include "polycode/core/PolyRenderer.h"
 #include <stdlib.h>
 
 using namespace Polycode;
 
-Texture::Texture(unsigned int width, unsigned int height, char *textureData,bool clamp, bool createMipmaps, int type, bool framebufferTexture) : Resource(Resource::RESOURCE_TEXTURE), width(width), height(height), clamp(true), type(type), createMipmaps(createMipmaps), filteringMode(FILTERING_LINEAR), anisotropy(0), framebufferTexture(framebufferTexture), depthTexture(false) {
-    
+bool Texture::premultiplyAlphaOnLoad = false;
+bool Texture::clampDefault = true;
+bool Texture::mipmapsDefault = true;
+bool Texture::keepTextureData = true;
+int Texture::defaultTextureFiltering = 1;
+
+Texture::Texture() : Resource(Resource::RESOURCE_TEXTURE), width(0), height(0), clamp(false), type(Image::IMAGE_RGBA), createMipmaps(false), filteringMode(defaultTextureFiltering), anisotropy(0), framebufferTexture(false), depthTexture(false) {
+	filteringMode = defaultTextureFiltering;
+}
+
+Texture::Texture(unsigned int width, unsigned int height, char *textureData,bool clamp, bool createMipmaps, int type, bool framebufferTexture) : Resource(Resource::RESOURCE_TEXTURE), width(width), height(height), clamp(clamp), type(type), createMipmaps(createMipmaps), filteringMode(defaultTextureFiltering), anisotropy(0), framebufferTexture(framebufferTexture), depthTexture(false) {
+	
 	switch(type) {
 		case Image::IMAGE_RGB:
-			pixelSize = 3;			
+			pixelSize = 3;
 			break;
 		case Image::IMAGE_RGBA:
-			pixelSize = 4;						
+			pixelSize = 4;
 		break;
-		case Image::IMAGE_FP16:		
-			pixelSize = 12;
+#ifndef NO_FP16
+		case Image::IMAGE_FP16:
+			pixelSize = 6;
 		break;
+#endif
 		default:
-			pixelSize = 4;								
+			pixelSize = 4;
 		break;
 	}
 	
-    if(!framebufferTexture) {
-        this->textureData = (char*)malloc(width*height*pixelSize);
-        if(textureData)
-            memcpy(this->textureData, textureData, width*height*pixelSize);	
-        else
-            memset(this->textureData, 0, width*height*pixelSize);
-    } else {
-        this->textureData = NULL;
-    }
+	if(!framebufferTexture) {
+		this->textureData = (char*)malloc(width*height*pixelSize);
+		if(textureData)
+			memcpy(this->textureData, textureData, width*height*pixelSize); 
+		else
+			memset(this->textureData, 0, width*height*pixelSize);
+	} else {
+		this->textureData = NULL;
+	}
 
 }
 
@@ -59,7 +74,7 @@ void Texture::reloadResource() {
 	Image *image = new Image(getResourcePath());
 	setImageData(image);
 	delete image;
-	Resource::reloadResource();	
+	Resource::reloadResource(); 
 }
 
 int Texture::getWidth() const {
@@ -71,6 +86,9 @@ int Texture::getHeight() const {
 }
 
 Texture::~Texture(){
+	if(platformData) {
+		Services()->getRenderer()->destroyTexturePlatformData(platformData);
+	}
 	free(textureData);
 }
 
@@ -78,16 +96,18 @@ void Texture::setImageData(Image *data) {
 
 	switch (data->getType()) {
 		case Image::IMAGE_RGB:
-			pixelSize = 3;			
+			pixelSize = 3;
 		break;
 		case Image::IMAGE_RGBA:
-			pixelSize = 4;						
+			pixelSize = 4;
 		break;
-		case Image::IMAGE_FP16:		
-			pixelSize = 12;
+#ifndef NO_FP16
+		case Image::IMAGE_FP16:
+			pixelSize = 6;
 		break;
+#endif
 		default:
-			pixelSize = 4;								
+			pixelSize = 4;
 		break;
 	}
 
@@ -101,33 +121,76 @@ void Texture::setImageData(Image *data) {
 
 }
 
-Texture::Texture(Image *image) : Resource(Resource::RESOURCE_TEXTURE) {	
+Texture::Texture(Image *image, bool clamp, bool createMipmaps) : Resource(Resource::RESOURCE_TEXTURE), clamp(clamp),  createMipmaps(createMipmaps), filteringMode(defaultTextureFiltering), anisotropy(0), framebufferTexture(false), depthTexture(false) {
+
+	Image *targetImage = image;
 	pixelSize = 4;
-	this->textureData = (char*)malloc(image->getWidth()*image->getHeight()*pixelSize);
-	memcpy(this->textureData, image->getPixels(), image->getWidth()*image->getHeight()*pixelSize);	
+
+	switch (image->getType()) {
+		case Image::IMAGE_RGB:
+			pixelSize = 3;
+			break;
+		case Image::IMAGE_RGBA:
+			pixelSize = 4;
+			break;
+		case Image::IMAGE_FP16:
+			pixelSize = 6;
+			break;
+		default:
+			pixelSize = 4;
+			break;
+	}
+
+	if (premultiplyAlphaOnLoad) {
+		targetImage = new Image(image);
+		targetImage->premultiplyAlpha();
+	}
+	
+	width = image->getWidth();
+	height = image->getHeight();
+
+
+	type = targetImage->getType();
+	this->textureData = (char*)malloc(targetImage->getWidth()*targetImage->getHeight()*pixelSize);
+	memcpy(this->textureData, targetImage->getPixels(), targetImage->getWidth()*targetImage->getHeight()*pixelSize);
+
+	if (premultiplyAlphaOnLoad) {
+		delete targetImage;
+	}
 
 }
 
 RenderBuffer::RenderBuffer(unsigned int width, unsigned int height, bool attachDepthBuffer, bool floatingPoint) : platformData(NULL), width(width), height(height), depthBufferPlatformData(NULL), floatingPoint(floatingPoint) {
-    
-    int imageType = Image::IMAGE_RGBA;
-    if(floatingPoint) {
-        imageType = Image::IMAGE_FP16;
-    }
-    colorTexture = new Texture(width, height, NULL, false, false, imageType, true);
-    if(attachDepthBuffer) {
-        depthTexture = new Texture(width, height, NULL, false, false, Image::IMAGE_RGBA, true);
-    } else {
-        depthTexture = NULL;
-    }
-    
+	
+	int imageType = Image::IMAGE_RGBA;
+#ifndef NO_FP16
+	if(floatingPoint) {
+		imageType = Image::IMAGE_FP16;
+	}
+#endif
+	colorTexture = std::make_shared<Texture>(width, height, nullptr, false, false, imageType, true);
+	if(attachDepthBuffer) {
+		depthTexture = std::make_shared<Texture>(width, height, nullptr, false, false, 1, true);
+	} else {
+		depthTexture = nullptr;
+	}
+	
+}
+
+RenderBuffer::~RenderBuffer() {
+	if(platformData) {
+		Services()->getRenderer()->destroyRenderBufferPlatformData(platformData);
+	}
+	if(depthBufferPlatformData) {
+		Services()->getRenderer()->destroyRenderBufferPlatformData(depthBufferPlatformData);
+	}
 }
 
 unsigned int RenderBuffer::getWidth() {
-    return width;
+	return width;
 }
 
 unsigned int RenderBuffer::getHeight() {
-    return height;
+	return height;
 }
 

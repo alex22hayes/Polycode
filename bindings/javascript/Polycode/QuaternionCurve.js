@@ -1,5 +1,10 @@
 function QuaternionCurve() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.QuaternionCurve()
+	}
 }
+
+
 Duktape.fin(QuaternionCurve.prototype, function (x) {
 	if (x === QuaternionCurve.prototype) {
 		return;
@@ -8,11 +13,7 @@ Duktape.fin(QuaternionCurve.prototype, function (x) {
 })
 
 QuaternionCurve.prototype.interpolate = function(t,useShortestPath) {
-	var retVal = new Quaternion()
-	retVal.__ptr = Polycode.QuaternionCurve_interpolate(this.__ptr, t,useShortestPath)
+	var retVal = new Quaternion("__skip_ptr__")
+	retVal.__ptr = Polycode.QuaternionCurve_interpolate(this.__ptr, t, useShortestPath)
 	return retVal
-}
-
-QuaternionCurve.prototype.generatePointsFromCurves = function(wCurve,xCurve,yCurve,zCurve) {
-	Polycode.QuaternionCurve_generatePointsFromCurves(this.__ptr, wCurve,xCurve,yCurve,zCurve)
 }

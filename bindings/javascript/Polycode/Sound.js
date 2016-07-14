@@ -1,5 +1,10 @@
-function Sound() {
+function Sound(fileName) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.Sound(fileName)
+	}
 }
+
+
 Duktape.fin(Sound.prototype, function (x) {
 	if (x === Sound.prototype) {
 		return;
@@ -8,7 +13,7 @@ Duktape.fin(Sound.prototype, function (x) {
 })
 
 Sound.prototype.getSampleAsNumber = function(offset,channel,position,orientation) {
-	return Polycode.Sound_getSampleAsNumber(this.__ptr, offset,channel,position,orientation)
+	return Polycode.Sound_getSampleAsNumber(this.__ptr, offset, channel, position, orientation)
 }
 
 Sound.prototype.loadFile = function(fileName) {
@@ -16,7 +21,7 @@ Sound.prototype.loadFile = function(fileName) {
 }
 
 Sound.prototype.Play = function(loop,restartSound) {
-	Polycode.Sound_Play(this.__ptr, loop,restartSound)
+	Polycode.Sound_Play(this.__ptr, loop, restartSound)
 }
 
 Sound.prototype.Stop = function() {
@@ -96,7 +101,7 @@ Sound.prototype.getFrequency = function() {
 }
 
 Sound.prototype.setPositionalProperties = function(referenceDistance,maxDistance) {
-	Polycode.Sound_setPositionalProperties(this.__ptr, referenceDistance,maxDistance)
+	Polycode.Sound_setPositionalProperties(this.__ptr, referenceDistance, maxDistance)
 }
 
 Sound.prototype.setReferenceDistance = function(referenceDistance) {
@@ -115,10 +120,6 @@ Sound.prototype.getMaxDistance = function() {
 	return Polycode.Sound_getMaxDistance(this.__ptr)
 }
 
-Sound.prototype.loadBytes = function(data,size,channels,freq,format) {
-	return Polycode.Sound_loadBytes(this.__ptr, data,size,channels,freq,format)
-}
-
 Sound.prototype.loadWAV = function(fileName) {
 	return Polycode.Sound_loadWAV(this.__ptr, fileName)
 }
@@ -128,7 +129,7 @@ Sound.prototype.loadOGG = function(fileName) {
 }
 
 Sound.prototype.soundCheck = function(result,err) {
-	Polycode.Sound_soundCheck(this.__ptr, result,err)
+	Polycode.Sound_soundCheck(this.__ptr, result, err)
 }
 
 Sound.prototype.updateStream = function(streamCount) {

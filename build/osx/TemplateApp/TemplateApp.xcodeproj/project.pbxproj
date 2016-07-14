@@ -24,15 +24,13 @@
 		8A86533B1B72931C009F94DD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A86533A1B72931C009F94DD /* Images.xcassets */; };
 		8A86533E1B72931C009F94DD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A86533C1B72931C009F94DD /* MainMenu.xib */; };
 		8A86535C1B72949F009F94DD /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8653531B72949F009F94DD /* libfreetype.a */; };
-		8A86535D1B72949F009F94DD /* liblibogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8653541B72949F009F94DD /* liblibogg.a */; };
-		8A86535E1B72949F009F94DD /* liblibvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8653551B72949F009F94DD /* liblibvorbis.a */; };
-		8A86535F1B72949F009F94DD /* liblibvorbisfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8653561B72949F009F94DD /* liblibvorbisfile.a */; };
 		8A8653611B72949F009F94DD /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8653581B72949F009F94DD /* libphysfs.a */; };
 		8A8653631B72949F009F94DD /* libPolycore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A86535A1B72949F009F94DD /* libPolycore.a */; };
 		8A8653641B72949F009F94DD /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A86535B1B72949F009F94DD /* libz.a */; };
 		8A8653681B7294B7009F94DD /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8653671B7294B7009F94DD /* OpenGL.framework */; };
 		8A86536B1B729559009F94DD /* PolycodeTemplateApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A86536A1B729559009F94DD /* PolycodeTemplateApp.mm */; };
 		8A8653961B752DBE009F94DD /* main_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A8653951B752DBE009F94DD /* main_icon.png */; };
+		8A92C6B21D11ADE400726C56 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 8A92C6B11D11ADE400726C56 /* main.js */; };
 		8A9D122C1CDD29EB00ACD484 /* js_Polycode.pak in Resources */ = {isa = PBXBuildFile; fileRef = 8A9D122B1CDD29EB00ACD484 /* js_Polycode.pak */; };
 		8ADFECF61C8E07FB007B57A2 /* hdr.pak in Resources */ = {isa = PBXBuildFile; fileRef = 8ADFECF51C8E07FB007B57A2 /* hdr.pak */; };
 		8ADFECFA1C8E0852007B57A2 /* default.pak in Resources */ = {isa = PBXBuildFile; fileRef = 8ADFECF91C8E0852007B57A2 /* default.pak */; };
@@ -70,6 +68,7 @@
 		8A86536A1B729559009F94DD /* PolycodeTemplateApp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PolycodeTemplateApp.mm; sourceTree = "<group>"; };
 		8A86536E1B72C301009F94DD /* PolycodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolycodeView.h; path = ../../../../include/polycode/view/osx/PolycodeView.h; sourceTree = "<group>"; };
 		8A8653951B752DBE009F94DD /* main_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = main_icon.png; path = ../../../../assets/icons/main_icon.png; sourceTree = "<group>"; };
+		8A92C6B11D11ADE400726C56 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = main.js; sourceTree = "<group>"; };
 		8A9D122B1CDD29EB00ACD484 /* js_Polycode.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = js_Polycode.pak; path = ../../../../bindings/javascript/js_Polycode.pak; sourceTree = "<group>"; };
 		8ADFECF51C8E07FB007B57A2 /* hdr.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = hdr.pak; path = ../../../../assets/default/hdr.pak; sourceTree = "<group>"; };
 		8ADFECF91C8E0852007B57A2 /* default.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = default.pak; path = ../../../../assets/default/default.pak; sourceTree = "<group>"; };
@@ -87,13 +86,10 @@
 				8A8653641B72949F009F94DD /* libz.a in Frameworks */,
 				8A825F271B82A2680039E823 /* libportaudio.a in Frameworks */,
 				8A8653631B72949F009F94DD /* libPolycore.a in Frameworks */,
-				8A86535F1B72949F009F94DD /* liblibvorbisfile.a in Frameworks */,
-				8A86535E1B72949F009F94DD /* liblibvorbis.a in Frameworks */,
 				8A86535C1B72949F009F94DD /* libfreetype.a in Frameworks */,
 				6D90506B1CCC057C00D0E80A /* liblua.a in Frameworks */,
 				6DD2D0B61BEEDC150026D85C /* libportaudio.a in Frameworks */,
 				8A8653611B72949F009F94DD /* libphysfs.a in Frameworks */,
-				8A86535D1B72949F009F94DD /* liblibogg.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +126,7 @@
 				6DCDD7241C724726007E90E1 /* main_icon.png */,
 				8A8653351B72931C009F94DD /* AppDelegate.h */,
 				6DB4EE6C1CFB4F3B00D39AA7 /* test.wav */,
+				8A92C6B11D11ADE400726C56 /* main.js */,
 				8A8653361B72931C009F94DD /* AppDelegate.m */,
 				6D6FD3E01BF122A2005AA8E9 /* PolycodeView.mm */,
 				8A7E202E1CD7D11A00EFC3CB /* rotate.js */,
@@ -224,6 +221,7 @@
 				8A86533B1B72931C009F94DD /* Images.xcassets in Resources */,
 				8A4ABF0A1CDBC69E007433DE /* lua_Polycode.pak in Resources */,
 				6DB4EE6D1CFB4F3B00D39AA7 /* test.wav in Resources */,
+				8A92C6B21D11ADE400726C56 /* main.js in Resources */,
 				8A8653961B752DBE009F94DD /* main_icon.png in Resources */,
 				8ADFECFA1C8E0852007B57A2 /* default.pak in Resources */,
 				8A9D122C1CDD29EB00ACD484 /* js_Polycode.pak in Resources */,

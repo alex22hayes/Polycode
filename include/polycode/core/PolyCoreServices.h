@@ -23,8 +23,8 @@ THE SOFTWARE.
 #pragma once
 #include "polycode/core/PolyGlobals.h"
 #include "polycode/core/PolyString.h"
+#include "polycode/core/PolyRectangle.h"
 #include "polycode/core/PolyEventDispatcher.h"
-#include "polycode/core/PolyMaterialManager.h"
 #include <map>
 
 namespace Polycode {
@@ -32,13 +32,12 @@ namespace Polycode {
 	class PolycodeModule;
 	class Renderer;
 	class Config;
-	class SceneManager;
 	class TimerManager;
 	class TweenManager;
 	class ResourceManager;
 	class SoundManager;
 	class Core;
-    class CoreInput;
+	class CoreInput;
 	class CoreMutex;
 	class Logger;
 	
@@ -55,8 +54,8 @@ namespace Polycode {
 			static void setInstance(CoreServices *_instance);
 			static CoreMutex *getRenderMutex();
 			
-            static void createInstance();
-        
+			static void createInstance();
+		
 			void setRenderer(Renderer *renderer);
 
 			/**
@@ -67,42 +66,26 @@ namespace Polycode {
 			Renderer *getRenderer();
 			
 			void Update(int elapsed);
-            void fixedUpdate();
-			void Render(const Polycode::Rectangle &viewport);
+			void fixedUpdate();
 			
 			void setCore(Core *core);
-        
+		
 			/**
 			* Returns the core. 
 			* @return The core.
 			* @see Core
 			*/																														
 			Core *getCore();
-        
-            /**
-             * Returns the core input.
-             * @return Core input.
-             * @see CoreInput
-             */
-            CoreInput *getInput();
-			
-			void handleEvent(Event *event);
-
+		
 			/**
-			* Returns the material manager. The material manager is responsible for loading and managing textures, shaders and materials.
-			* @return Material manager.
-			* @see MaterialManager
-			*/
-			MaterialManager *getMaterialManager();
+			 * Returns the core input.
+			 * @return Core input.
+			 * @see CoreInput
+			 */
+			CoreInput *getInput();
 			
-			
-			/**
-			* Returns the scene manager. The screen manager is responsible for maintaining and rendering 3D scenes.
-			* @return Scene Manager
-			* @see SceneManager
-			*/						
-			SceneManager *getSceneManager();
-			
+			void handleEvent(Event *event);		
+		
 			/**
 			* Returns the timer manager. The timer manager is responsible for updating timers in the framework.
 			* @return Timer Manager
@@ -160,8 +143,6 @@ namespace Polycode {
 					
 			Core *core;
 			Config *config;
-			MaterialManager *materialManager;
-			SceneManager *sceneManager;
 			Logger *logger;
 			TimerManager *timerManager;
 			TweenManager *tweenManager;
@@ -169,8 +150,8 @@ namespace Polycode {
 			SoundManager *soundManager;
 			Renderer *renderer;
 	};
-    
+	
 
 	_PolyExport CoreServices *Services();
-    
+	
 }

@@ -10,12 +10,6 @@ function LocalShaderParam:__getvar(name)
 		return Polycode.LocalShaderParam_get_ownsPointer(self.__ptr)
 	elseif name == "arraySize" then
 		return Polycode.LocalShaderParam_get_arraySize(self.__ptr)
-	elseif name == "param" then
-		local retVal = Polycode.LocalShaderParam_get_param(self.__ptr)
-		if retVal == nil then return nil end
-		local __c = _G["ProgramParam"]("__skip_ptr__")
-		__c.__ptr = retVal
-		return __c
 	end
 end
 
@@ -31,9 +25,6 @@ function LocalShaderParam:__setvar(name,value)
 		return true
 	elseif name == "arraySize" then
 		Polycode.LocalShaderParam_set_arraySize(self.__ptr, value)
-		return true
-	elseif name == "param" then
-		Polycode.LocalShaderParam_set_param(self.__ptr, value.__ptr)
 		return true
 	end
 	return false
@@ -55,7 +46,7 @@ end
 function LocalShaderParam:Copy()
 	local retVal =  Polycode.LocalShaderParam_Copy(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["LocalShaderParam"]("__skip_ptr__")
+	local __c = _G["shared_ptr<LocalShaderParam>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end
@@ -113,6 +104,10 @@ function LocalShaderParam:setMatrix4(x)
 	local retVal = Polycode.LocalShaderParam_setMatrix4(self.__ptr, x.__ptr)
 end
 
+function LocalShaderParam:setMatrix4Array(x)
+	local retVal = Polycode.LocalShaderParam_setMatrix4Array(self.__ptr, x.__ptr)
+end
+
 function LocalShaderParam:setColor(x)
 	local retVal = Polycode.LocalShaderParam_setColor(self.__ptr, x.__ptr)
 end
@@ -124,7 +119,7 @@ end
 function LocalShaderParam:getTexture()
 	local retVal =  Polycode.LocalShaderParam_getTexture(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["Texture"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Texture>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end
@@ -136,7 +131,7 @@ end
 function LocalShaderParam:getCubemap()
 	local retVal =  Polycode.LocalShaderParam_getCubemap(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["Cubemap"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Cubemap>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end

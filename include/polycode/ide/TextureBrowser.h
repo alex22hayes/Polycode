@@ -26,6 +26,7 @@
 #include "polycode/modules/ui/PolycodeUI.h"
 #include "Polycode.h"
 #include "polycode/ide/PolycodeProject.h"
+#include <memory>
 
 using namespace Polycode;
 
@@ -37,15 +38,15 @@ public:
 
 class AssetEntry : public UIElement {
 	public:
-		AssetEntry(String assetPath, String assetName, String extension, Resource *resource);
+		AssetEntry(String assetPath, String assetName, String extension, std::shared_ptr<Resource> resource);
 		~AssetEntry();
 		
 		UIRect *imageShape;
-        SceneSprite *spritePreview;
+		SceneSprite *spritePreview;
 		UILabel *nameLabel;
 		
 		String assetPath;
-        Resource *resource;
+		std::shared_ptr<Resource> resource;
 		UIRect *selectShape;
 };
 
@@ -57,21 +58,21 @@ class AssetList : public UIElement {
 		void handleEvent(Event *event);
 		
 		bool hasExtension(String extension);
-    
-        void clearList();
+	
+		void clearList();
 		
 		void showFolder(String folderPath);
-        void showResourcePool(ResourcePool *pool, int resourceFilter);
-    
-        Resource *getSelectedResource();
-    
+		void showResourcePool(ResourcePool *pool, int resourceFilter);
+	
+		std::shared_ptr<Resource> getSelectedResource();
+	
 		String selectedPath;
 		
 		void setExtensions(std::vector<String> extensions);
 		
 	protected:
 	
-        Resource *selectedResource;
+		std::shared_ptr<Resource> selectedResource;
 		UIImageButton *reloadButton;
 	
 		String currentFolderPath;
@@ -98,17 +99,17 @@ class AssetBrowser : public UIWindow {
 		void setExtensions(std::vector<String> extensions);
 		
 		void setProject(PolycodeProject *project);
-    
-        void setBrowseMode(unsigned int newBrowseMode);
+	
+		void setBrowseMode(unsigned int newBrowseMode);
 
-        void setResourcePools(std::vector<ResourcePool*> pools, int resourceFilter);
-        void setResourceFilter(int resourceType);
+		void setResourcePools(std::vector<ResourcePool*> pools, int resourceFilter);
+		void setResourceFilter(int resourceType);
 		void handleEvent(Event *event);
-    
-        Resource *getSelectedResource();
-    
-        static const int BROWSE_MODE_FILES = 0;
-        static const int BROWSE_MODE_RESOURCES = 1;
+	
+		std::shared_ptr<Resource> getSelectedResource();
+	
+		static const int BROWSE_MODE_FILES = 0;
+		static const int BROWSE_MODE_RESOURCES = 1;
 	
 	protected:
 	
@@ -117,14 +118,14 @@ class AssetBrowser : public UIWindow {
 	
 		PolycodeProject *currentProject;
 	
-        unsigned int browseMode;
-        int resourceFilter;
-    
+		unsigned int browseMode;
+		int resourceFilter;
+	
 		UIButton *cancelButton;
 		UIButton *okButton;
 		
 		String templatePath;
 			
-		UITreeContainer *templateContainer;	
+		UITreeContainer *templateContainer; 
 		UITree *defaultTemplateTree;
 };

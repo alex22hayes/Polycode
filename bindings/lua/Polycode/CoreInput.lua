@@ -125,22 +125,6 @@ function CoreInput:getNumJoysticks()
 	return retVal
 end
 
-function CoreInput:getJoystickInfoByIndex(index)
-	local retVal = Polycode.CoreInput_getJoystickInfoByIndex(self.__ptr, index)
-	if retVal == nil then return nil end
-	local __c = _G["JoystickInfo"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function CoreInput:getJoystickInfoByID(deviceID)
-	local retVal = Polycode.CoreInput_getJoystickInfoByID(self.__ptr, deviceID)
-	if retVal == nil then return nil end
-	local __c = _G["JoystickInfo"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
 function CoreInput:addJoystick(deviceID)
 	local retVal = Polycode.CoreInput_addJoystick(self.__ptr, deviceID)
 end
@@ -177,8 +161,8 @@ function CoreInput:setMousePosition(x, y, ticks)
 	local retVal = Polycode.CoreInput_setMousePosition(self.__ptr, x, y, ticks)
 end
 
-function CoreInput:setKeyState(keyCode, code, newState, ticks)
-	local retVal = Polycode.CoreInput_setKeyState(self.__ptr, keyCode, code.__ptr, newState, ticks)
+function CoreInput:setKeyState(keyCode, newState, ticks)
+	local retVal = Polycode.CoreInput_setKeyState(self.__ptr, keyCode, newState, ticks)
 end
 
 function CoreInput:setDeltaPosition(x, y)
@@ -197,12 +181,8 @@ function CoreInput:touchesEnded(touch, touches, ticks)
 	local retVal = Polycode.CoreInput_touchesEnded(self.__ptr, touch.__ptr, touches.__ptr, ticks)
 end
 
-function CoreInput:createEvent(event)
-	local retVal = Polycode.CoreInput_createEvent(self.__ptr, event.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["InputEvent"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
+function CoreInput:textInput(text)
+	local retVal = Polycode.CoreInput_textInput(self.__ptr, text)
 end
 
 function CoreInput:clearInput()

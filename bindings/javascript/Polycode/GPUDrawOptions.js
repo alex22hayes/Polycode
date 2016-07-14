@@ -1,4 +1,7 @@
 function GPUDrawOptions() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.GPUDrawOptions()
+	}
 	Object.defineProperties(this, {
 		'depthTest': { enumerable: true, configurable: true, get: GPUDrawOptions.prototype.__get_depthTest, set: GPUDrawOptions.prototype.__set_depthTest},
 		'depthWrite': { enumerable: true, configurable: true, get: GPUDrawOptions.prototype.__get_depthWrite, set: GPUDrawOptions.prototype.__set_depthWrite},
@@ -13,6 +16,8 @@ function GPUDrawOptions() {
 		'drawColor': { enumerable: true, configurable: true, get: GPUDrawOptions.prototype.__get_drawColor, set: GPUDrawOptions.prototype.__set_drawColor}
 	})
 }
+
+
 GPUDrawOptions.prototype.__get_depthTest = function() {
 	return Polycode.GPUDrawOptions__get_depthTest(this.__ptr)
 }
@@ -78,7 +83,7 @@ GPUDrawOptions.prototype.__set_blendingMode = function(val) {
 }
 
 GPUDrawOptions.prototype.__get_scissorBox = function() {
-	var retVal = new Rectangle()
+	var retVal = new Rectangle("__skip_ptr__")
 	retVal.__ptr = 	Polycode.GPUDrawOptions__get_scissorBox(this.__ptr)
 	return retVal
 }
@@ -96,7 +101,7 @@ GPUDrawOptions.prototype.__set_enableScissor = function(val) {
 }
 
 GPUDrawOptions.prototype.__get_drawColor = function() {
-	var retVal = new Color()
+	var retVal = new Color("__skip_ptr__")
 	retVal.__ptr = 	Polycode.GPUDrawOptions__get_drawColor(this.__ptr)
 	return retVal
 }

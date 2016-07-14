@@ -1,4 +1,9 @@
+require('Polycode/EventDispatcher')
+
 function ResourcePool() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.ResourcePool()
+	}
 	Object.defineProperties(this, {
 		'reloadResourcesOnModify': { enumerable: true, configurable: true, get: ResourcePool.prototype.__get_reloadResourcesOnModify, set: ResourcePool.prototype.__set_reloadResourcesOnModify},
 		'dispatchChangeEvents': { enumerable: true, configurable: true, get: ResourcePool.prototype.__get_dispatchChangeEvents, set: ResourcePool.prototype.__set_dispatchChangeEvents},
@@ -6,6 +11,10 @@ function ResourcePool() {
 		'deleteOnUnsubscribe': { enumerable: true, configurable: true, get: ResourcePool.prototype.__get_deleteOnUnsubscribe, set: ResourcePool.prototype.__set_deleteOnUnsubscribe}
 	})
 }
+
+
+ResourcePool.prototype = Object.create(EventDispatcher.prototype)
+
 ResourcePool.prototype.__get_reloadResourcesOnModify = function() {
 	return Polycode.ResourcePool__get_reloadResourcesOnModify(this.__ptr)
 }
@@ -45,10 +54,6 @@ Duktape.fin(ResourcePool.prototype, function (x) {
 	Polycode.ResourcePool__delete(x.__ptr)
 })
 
-ResourcePool.prototype.setFallbackPool = function(pool) {
-	Polycode.ResourcePool_setFallbackPool(this.__ptr, pool)
-}
-
 ResourcePool.prototype.addResource = function(resource) {
 	Polycode.ResourcePool_addResource(this.__ptr, resource)
 }
@@ -62,24 +67,28 @@ ResourcePool.prototype.hasResource = function(resource) {
 }
 
 ResourcePool.prototype.loadResourcesFromFolder = function(folder,recursive) {
-	Polycode.ResourcePool_loadResourcesFromFolder(this.__ptr, folder,recursive)
+	Polycode.ResourcePool_loadResourcesFromFolder(this.__ptr, folder, recursive)
+}
+
+ResourcePool.prototype.loadResourcesFromMaterialFile = function(path) {
+	Polycode.ResourcePool_loadResourcesFromMaterialFile(this.__ptr, path)
 }
 
 ResourcePool.prototype.loadResource = function(path) {
-	var retVal = new Resource()
+	var retVal = new Resource("__skip_ptr__")
 	retVal.__ptr = Polycode.ResourcePool_loadResource(this.__ptr, path)
 	return retVal
 }
 
 ResourcePool.prototype.loadResourceWithName = function(path,name) {
-	var retVal = new Resource()
-	retVal.__ptr = Polycode.ResourcePool_loadResourceWithName(this.__ptr, path,name)
+	var retVal = new Resource("__skip_ptr__")
+	retVal.__ptr = Polycode.ResourcePool_loadResourceWithName(this.__ptr, path, name)
 	return retVal
 }
 
 ResourcePool.prototype.getResource = function(resourceType,resourceName) {
-	var retVal = new Resource()
-	retVal.__ptr = Polycode.ResourcePool_getResource(this.__ptr, resourceType,resourceName)
+	var retVal = new Resource("__skip_ptr__")
+	retVal.__ptr = Polycode.ResourcePool_getResource(this.__ptr, resourceType, resourceName)
 	return retVal
 }
 
@@ -91,8 +100,14 @@ ResourcePool.prototype.setName = function(name) {
 	Polycode.ResourcePool_setName(this.__ptr, name)
 }
 
+ResourcePool.prototype.loadFont = function(name,path) {
+	var retVal = new Font("__skip_ptr__")
+	retVal.__ptr = Polycode.ResourcePool_loadFont(this.__ptr, name, path)
+	return retVal
+}
+
 ResourcePool.prototype.getResourceByPath = function(resourcePath) {
-	var retVal = new Resource()
+	var retVal = new Resource("__skip_ptr__")
 	retVal.__ptr = Polycode.ResourcePool_getResourceByPath(this.__ptr, resourcePath)
 	return retVal
 }

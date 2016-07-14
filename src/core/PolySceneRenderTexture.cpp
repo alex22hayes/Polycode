@@ -23,70 +23,45 @@
 #include "polycode/core/PolySceneRenderTexture.h"
 #include "polycode/core/PolyCoreServices.h"
 #include "polycode/core/PolyRenderer.h"
-#include "polycode/core/PolySceneManager.h"
 #include "polycode/core/PolyTexture.h"
 #include "polycode/core/PolyScene.h"
 #include "polycode/core/PolyCamera.h"
 
 using namespace Polycode;
 
-SceneRenderTexture::SceneRenderTexture(Scene *targetScene, Camera *targetCamera, int renderWidth,int renderHeight, bool floatingPoint) : floatingPoint(floatingPoint) {
-    
-    targetFramebuffer = Services()->getRenderer()->createRenderBuffer(renderWidth, renderHeight, true, floatingPoint);
-    
-	this->targetScene = targetScene;
-	this->targetCamera = targetCamera;
-
-	CoreServices::getInstance()->getSceneManager()->registerRenderTexture(this);
-    renderer = Services()->getRenderer();
-    
+SceneRenderTexture::SceneRenderTexture(int renderWidth,int renderHeight, bool floatingPoint) : floatingPoint(floatingPoint) {
+	
+	targetFramebuffer = std::make_shared<RenderBuffer>(renderWidth, renderHeight, true, floatingPoint);
+	renderer = Services()->getRenderer();
+	
 	enabled = true;
 }
 
 void SceneRenderTexture::resizeRenderTexture(int newWidth, int newHeight) {
 
 	if(newWidth > 0 && newHeight > 0) {
-        Services()->getRenderer()->destroyRenderBuffer(targetFramebuffer);
-        targetFramebuffer = Services()->getRenderer()->createRenderBuffer(newWidth, newHeight, true, floatingPoint);
+		targetFramebuffer = nullptr;
+		targetFramebuffer = std::make_shared<RenderBuffer>(newWidth, newHeight, true, floatingPoint);
 	}
 }
-	
-Scene *SceneRenderTexture::getTargetScene() {
-	return targetScene;
-}
 
-Texture *SceneRenderTexture::getFilterColorBufferTexture() {
-	return NULL;
-}
-
-Texture *SceneRenderTexture::getFilterZBufferTexture() {
-	return NULL;
-}
-
-Camera *SceneRenderTexture::getTargetCamera() {
-	return targetCamera;
-}
-
-void SceneRenderTexture::Render() {
-    if(targetCamera->hasFilterShader()) {
-        targetCamera->drawFilter(targetFramebuffer);
-    } else {
-        targetCamera->setViewport(Polycode::Rectangle(0.0, 0.0, targetFramebuffer->getWidth(), targetFramebuffer->getHeight()));
-        targetScene->Render(targetCamera, targetFramebuffer, NULL, true);
-    }
+void SceneRenderTexture::Render(RenderFrame *frame, Scene *targetScene, Camera* targetCamera) {
+	if(targetCamera->hasFilterShader()) {
+		targetCamera->drawFilter(frame, targetFramebuffer, targetScene);
+	} else {
+		targetScene->Render(frame, targetCamera, targetFramebuffer, NULL, true);
+	}
 }
 
 Image *SceneRenderTexture::saveToImage() {
-    //RENDERER_TODO
-    //return renderer->renderBufferToImage(targetTexture);
-    return NULL;
+	//RENDERER_TODO
+	//return renderer->renderBufferToImage(targetTexture);
+	return NULL;
 }
 
-Texture *SceneRenderTexture::getTargetTexture() {
+std::shared_ptr<Texture> SceneRenderTexture::getTargetTexture() {
 	return targetFramebuffer->colorTexture;
 }
 
 SceneRenderTexture::~SceneRenderTexture() {
-	CoreServices::getInstance()->getSceneManager()->unregisterRenderTexture(this);
-    Services()->getRenderer()->destroyRenderBuffer(targetFramebuffer);
 }

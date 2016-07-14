@@ -40,13 +40,13 @@ namespace Polycode {
 	
 	class _PolyExport BoneTrack : public PolyBase {
 		public:
-			BoneTrack(Bone *bone, Number length);
+			BoneTrack(std::shared_ptr<Bone> bone, Number length);
 			~BoneTrack();
-        
+		
 			void Play(bool once=false);
 			void Stop();
 			void Update(Number elapsed);
-            void Reset();
+			void Reset();
 		
 			void setSpeed(Number speed);
 			
@@ -62,20 +62,20 @@ namespace Polycode {
 			BezierCurve *LocZ;
 			
 			Vector3 position;
-            Vector3 scale;
+			Vector3 scale;
 			Quaternion boneQuat;
-            QuaternionCurve *quatCurve;
-        
-            Number weight;
+			QuaternionCurve *quatCurve;
+		
+			Number weight;
 			
 		protected:
 		
 			Number length;
-            Number speed;
-            bool paused;
-            Number time;
-			Bone *targetBone;
-            bool playOnce;
+			Number speed;
+			bool paused;
+			Number time;
+            std::shared_ptr<Bone> targetBone;
+			bool playOnce;
 		
 	};
 
@@ -107,9 +107,9 @@ namespace Polycode {
 			* Stops the animation.
 			*/			
 			void Stop();
-        
-            void Reset();
-        
+		
+			void Reset();
+		
 			void Update();
 
 			/**
@@ -118,15 +118,15 @@ namespace Polycode {
 			*/					
 			void setSpeed(Number speed);
 			
-            void setWeight(Number newWeight);
-            Number getWeight() const;
-        
-            bool isPlaying() const;
-        
+			void setWeight(Number newWeight);
+			Number getWeight() const;
+		
+			bool isPlaying() const;
+		
 		protected:
 			
-            Number weight;
-            bool playing;
+			Number weight;
+			bool playing;
 			String name;
 			Number duration;
 			std::vector<BoneTrack*> boneTracks;
@@ -170,15 +170,15 @@ namespace Polycode {
 			void playAnimationByName(const String& animName, Number weight = 1.0, bool once = false, bool restartIfPlaying = false);
 			
 
-            void playAnimation(SkeletonAnimation *animation, Number weight = 1.0, bool once = false, bool restartIfPlaying = false);
-        
-            void setBaseAnimationByName(const String &animName);
-            void setBaseAnimation(SkeletonAnimation *animation);
-        
-            void stopAllAnimations();
-        
-            SkeletonAnimation *getBaseAnimation();
-        
+			void playAnimation(SkeletonAnimation *animation, Number weight = 1.0, bool once = false, bool restartIfPlaying = false);
+		
+			void setBaseAnimationByName(const String &animName);
+			void setBaseAnimation(SkeletonAnimation *animation);
+		
+			void stopAllAnimations();
+		
+			SkeletonAnimation *getBaseAnimation();
+		
 			/**
 			* Loads in a new animation from a file and adds it to the skeleton.
 			* @param name Name of the new animation.
@@ -192,17 +192,17 @@ namespace Polycode {
 			*/
 			SkeletonAnimation *getAnimation(const String& name) const;
 
-        
-            void stopAnimationByName(const String &name);
-            void stopAnimation(SkeletonAnimation *animation);
-        
+		
+			void stopAnimationByName(const String &name);
+			void stopAnimation(SkeletonAnimation *animation);
+		
 			void Update();
 			
 			/**
 			* Get bone instance by its name
 			* @param name Name of the bone.
 			*/
-			Bone *getBoneByName(const String& name) const;
+			std::shared_ptr<Bone> getBoneByName(const String& name) const;
 			
 			/**
 			* Toggles bone visibility on and off.
@@ -219,20 +219,20 @@ namespace Polycode {
 			* Returns a bone at the specified index.
 			* @param index Bone index.
 			*/
-			Bone *getBone(unsigned int index) const;
+            std::shared_ptr<Bone> getBone(unsigned int index) const;
 		
-            void addBone(Bone *bone);
-            void removeBone(Bone *bone);
-        
-            unsigned int getBoneIndexByBone(Bone *bone);
-        
+			void addBone(std::shared_ptr<Bone> bone);
+			void removeBone(std::shared_ptr<Bone> bone);
+		
+			unsigned int getBoneIndexByBone(std::shared_ptr<Bone> bone);
+		
 		protected:
 		
 			Entity *bonesEntity;
 		
-            SkeletonAnimation *baseAnimation;
-            std::vector<SkeletonAnimation*> playingAnimations;
-			std::vector<Bone*> bones;
+			SkeletonAnimation *baseAnimation;
+			std::vector<SkeletonAnimation*> playingAnimations;
+            std::vector<std::shared_ptr<Bone> > bones;
 			std::vector<SkeletonAnimation*> animations;
 	};
 

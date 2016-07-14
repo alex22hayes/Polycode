@@ -33,9 +33,10 @@ namespace Polycode {
 	class Mesh;
 	class Texture;
 	class Skeleton;
+    class Bone;
 	class Image;
-    class ResourcePool;
-	
+	class ResourcePool;
+    
 	/**
 	* 3D polygonal mesh instance. The SceneMesh is the base for all polygonal 3d geometry. It can have simple textures or complex materials applied to it.
 	*/
@@ -51,14 +52,14 @@ namespace Polycode {
 			/**
 			* Construct scene mesh from an existing Mesh instance.
 			*/
-			explicit SceneMesh(Mesh *mesh);
-        
-            SceneMesh();
+			explicit SceneMesh(std::shared_ptr<Mesh> mesh);
+		
+			SceneMesh();
 			
 			/**
 			* Construct scene mesh from an existing Mesh instance.
 			*/			
-			static SceneMesh *SceneMeshFromMesh(Mesh *mesh);
+			static SceneMesh *SceneMeshFromMesh(std::shared_ptr<Mesh> mesh);
 			
 			virtual ~SceneMesh();
 			
@@ -66,25 +67,25 @@ namespace Polycode {
 			
 
 			ShaderPass getShaderPass(unsigned int index);
-            unsigned int getNumShaderPasses();
-            void addShaderPass(ShaderPass pass);
-            void removeShaderPass(int shaderIndex);
-        
+			unsigned int getNumShaderPasses();
+			void addShaderPass(ShaderPass pass);
+			void removeShaderPass(int shaderIndex);
+		
 			/**
 			* Returns the Mesh instance of the actual mesh.
 			*/
-			Mesh *getMesh();
+			std::shared_ptr<Mesh> getMesh();
 			
 			/**
 			* Returns the material applied.
 			*/							
-			Material *getMaterial();
+			std::shared_ptr<Material> getMaterial();
 			
 			/**
 			* Loads a skeleton from a file and applies it to the scene mesh.
 			* @param fileName Filename to load the skeleton from.
 			*/
-			Skeleton *loadSkeleton(const String& fileName);
+			std::shared_ptr<Skeleton> loadSkeleton(const String& fileName);
 
 			/**
 			* Clears the currently applied material
@@ -95,7 +96,7 @@ namespace Polycode {
 			* Set material from existing Material instance.
 			* @param material Material to apply.
 			*/												
-			void setMaterial(Material *material);
+			void setMaterial(std::shared_ptr<Material> material);
 			
 			/**
 			* Set material by name. You can create materials in material files and name them there, then use this to set a material by name to a scene mesh.
@@ -107,110 +108,94 @@ namespace Polycode {
 			* Set the mesh this scene mesh renders.
 			* @param mesh Set a new mesh to render.
 			*/															
-			void setMesh(Mesh *mesh);
+			void setMesh(std::shared_ptr<Mesh> mesh);
 		
 			/**
 			* Sets a skeleton from an existing skeleton instance.
 			* @param skeleton Skeleton to set to this mesh.
 			*/
-			void setSkeleton(Skeleton *skeleton);
+			void setSkeleton(std::shared_ptr<Skeleton> skeleton);
 			
 			/**
 			* Returns the skeleton applied to this scene mesh.
 			*/
-			Skeleton *getSkeleton();
-		
-			void applySkeletonLocally();
+			std::shared_ptr<Skeleton> getSkeleton();
 			
-            /**
-             * Sets the line width for line-based meshes.
-             */
+			/**
+			 * Sets the line width for line-based meshes.
+			 */
 			void setLineWidth(Number newWidth);
 
-            /**
-             * If this mesh was loaded form file, returns the filename of the loaded mesh.
-             */
-            String getFilename();
-        
-            /**
-             * Sets the filename path of the mesh.
-             */
-            void setFilename(String fileName);
-        
-            /**
-             * Loads mesh from file. Deletes current mesh if ownsMesh is set to true.
-             */
-            void loadFromFile(String fileName);
-        
-            /**
-             * Line width for line-based meshes.
-             */
+			/**
+			 * If this mesh was loaded form file, returns the filename of the loaded mesh.
+			 */
+			String getFilename();
+		
+			/**
+			 * Sets the filename path of the mesh.
+			 */
+			void setFilename(const String &fileName);
+		
+			/**
+			 * Loads mesh from file. Deletes current mesh if ownsMesh is set to true.
+			 */
+			void loadFromFile(const String &fileName);
+		
+			/**
+			 * Line width for line-based meshes.
+			 */
 			Number lineWidth;
-        
-            /**
-             * If set to true, will antialias the lines in a line-based mesh. Defaults to false.
-             */
+		
+			/**
+			 * If set to true, will antialias the lines in a line-based mesh. Defaults to false.
+			 */
 			bool lineSmooth;
 			
-            /**
-             * If setto true, will antialias points in a point-based mesh. Defaults to false.
-             */
+			/**
+			 * If setto true, will antialias points in a point-based mesh. Defaults to false.
+			 */
 			bool pointSmooth;
 			
 			/**
-			* If true, will delete its Mesh upon destruction or mesh loading. (defaults to true)
-			*/ 
-			bool ownsMesh;
-
-			/**
-			* If true, will delete its Skeleton upon destruction. (defaults to true)
-			*/ 			
-			bool ownsSkeleton;
-			
-            /**
-             * If set to true, will check against actual geometry polygons on ray hit detection. Defaults to false.
-             */
+			 * If set to true, will check against actual geometry polygons on ray hit detection. Defaults to false.
+			 */
 			bool useGeometryHitDetection;
 			
 			bool customHitDetection(const Ray &ray);
-        
-            /**
-             * The Renderer has an ability to set an override material that is set for all rendered entities. If forceMaterial is set to true, this entity will always use its assigned material, even if an override material is set.
-             */
-            void setForceMaterial(bool forceMaterial);
-            bool getForceMaterial();
-        
-            virtual Entity *Clone(bool deepClone, bool ignoreEditorOnly) const;
-            virtual void applyClone(Entity *clone, bool deepClone, bool ignoreEditorOnly) const;        
-            
-            /**
-             * Normally, translucent textures do not affect the depth buffer, but if this flag is set to true, this entity's alpha channel is written to the depth buffer at a preset threshold. This flag is set to false by default.
-             */
-            bool alphaTest;
-            
-            /**
-             * If this flag is set to false, backface culling is disabled when rendering this entity, rendering both sides of each face. Set to true by default.
-             */
-            bool backfaceCulled;
-            bool sendBoneMatricesToMaterial;
+		
+			/**
+			 * The Renderer has an ability to set an override material that is set for all rendered entities. If forceMaterial is set to true, this entity will always use its assigned material, even if an override material is set.
+			 */
+			void setForceMaterial(bool forceMaterial);
+			bool getForceMaterial();
+		
+			virtual Entity *Clone(bool deepClone, bool ignoreEditorOnly) const;
+			virtual void applyClone(Entity *clone, bool deepClone, bool ignoreEditorOnly) const;		
+			
+			/**
+			 * Normally, translucent textures do not affect the depth buffer, but if this flag is set to true, this entity's alpha channel is written to the depth buffer at a preset threshold. This flag is set to false by default.
+			 */
+			bool alphaTest;
+			
+			/**
+			 * If this flag is set to false, backface culling is disabled when rendering this entity, rendering both sides of each face. Set to true by default.
+			 */
+			bool backfaceCulled;
+			bool sendBoneMatricesToMaterial;
 			
 		protected:
-        
+		
+            void createMaterialBoneParams(ShaderBinding *shaderBinding);
 			bool useVertexBuffer;
-			Mesh *mesh;
-			Material *material;
-			Skeleton *skeleton;
-        
-            std::vector<ShaderPass> shaderPasses;
-        
-            String fileName;
-            std::vector<Matrix4> materialBoneMatrices;
-                    
-        
-            VertexDataArray skeletalVertexPositions;
-            VertexDataArray skeletalVertexNormals;
-        
-        
-        
+			std::shared_ptr<Mesh> mesh;
+			std::shared_ptr<Material> material;
+			std::shared_ptr<Skeleton> skeleton;
+			std::vector<std::shared_ptr<LocalShaderParam> > colorParams;
+            std::vector<std::shared_ptr<LocalShaderParam> > boneMatrixParams;        
+			std::vector<ShaderPass> shaderPasses;
+			String fileName;
+		
+		
+		
 	};
 }

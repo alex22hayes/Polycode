@@ -1,10 +1,18 @@
 function TouchInfo() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.TouchInfo()
+	}
 	Object.defineProperties(this, {
 		'id': { enumerable: true, configurable: true, get: TouchInfo.prototype.__get_id, set: TouchInfo.prototype.__set_id},
 		'position': { enumerable: true, configurable: true, get: TouchInfo.prototype.__get_position, set: TouchInfo.prototype.__set_position},
 		'type': { enumerable: true, configurable: true, get: TouchInfo.prototype.__get_type, set: TouchInfo.prototype.__set_type}
 	})
 }
+
+TouchInfo.TYPEBASE = 0x500
+TouchInfo.TYPE_TOUCH = TYPEBASE + 0
+TouchInfo.TYPE_PEN = TYPEBASE + 1
+
 TouchInfo.prototype.__get_id = function() {
 	return Polycode.TouchInfo__get_id(this.__ptr)
 }
@@ -14,7 +22,7 @@ TouchInfo.prototype.__set_id = function(val) {
 }
 
 TouchInfo.prototype.__get_position = function() {
-	var retVal = new Vector2()
+	var retVal = new Vector2("__skip_ptr__")
 	retVal.__ptr = 	Polycode.TouchInfo__get_position(this.__ptr)
 	return retVal
 }

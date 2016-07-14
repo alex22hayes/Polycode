@@ -1,5 +1,15 @@
-function Timer() {
+require('Polycode/EventDispatcher')
+
+function Timer(triggerMode,msecs) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.Timer(triggerMode,msecs)
+	}
 }
+
+Timer.EVENT_TRIGGER = 0
+
+Timer.prototype = Object.create(EventDispatcher.prototype)
+
 Duktape.fin(Timer.prototype, function (x) {
 	if (x === Timer.prototype) {
 		return;

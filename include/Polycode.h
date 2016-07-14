@@ -53,12 +53,10 @@
 #include "polycode/core/PolyImage.h"
 #include "polycode/core/PolyLabel.h"
 #include "polycode/core/PolyFont.h"
-#include "polycode/core/PolyFontGlyphSheet.h"
 #include "polycode/core/PolyTexture.h"
 #include "polycode/core/PolyMaterial.h"
 #include "polycode/core/PolyMesh.h"
 #include "polycode/core/PolyShader.h"
-#include "polycode/core/PolySceneManager.h"
 #include "polycode/core/PolyCoreServices.h"
 #include "polycode/core/PolyCamera.h"
 #include "polycode/core/PolyScene.h"
@@ -77,7 +75,6 @@
 #include "polycode/core/PolySound.h"
 #include "polycode/core/PolySoundManager.h"
 #include "polycode/core/PolySceneSound.h"
-#include "polycode/core/PolySceneImage.h"
 #include "polycode/core/PolyClient.h"
 #include "polycode/core/PolyPeer.h"
 #include "polycode/core/PolyServer.h"
@@ -91,20 +88,30 @@
 
 #if defined(__APPLE__) && defined(__MACH__)
 	#include <TargetConditionals.h>
-    #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		#include "polycode/core/PolyIOSCore.h"
  	#endif
 #else
     #if defined(_WINDOWS) && !defined(_MINGW)
-        #include "polycode/core/PolyWinCore.h"
-    #else
+		#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PC_APP || WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
+			#include "polycode/core/PolyUWPCore.h"
+		#else
+			#include "polycode/core/PolyWinCore.h"
+		#endif
+	#else
 		#if defined(WINAPI_FAMILY)
 			#include "polycode/core/PolyUWPCore.h"
 		#else
 			#ifdef RPI_CORE
 				#include "polycode/core/PolyRPICore.h"
+			#elif defined(__ANDROID__)
+				#include "polycode/core/PolyAndroidCore.h"
 			#else
-				#include "polycode/core/PolySDLCore.h"
+				#ifdef EMSCRIPTEN
+					#include "polycode/core/PolyEmscriptenCore.h"
+				#else
+					#include "polycode/core/PolySDLCore.h"
+				#endif
 			#endif
 		#endif
     #endif

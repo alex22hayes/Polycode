@@ -10,10 +10,6 @@ function SceneMesh:__getvar(name)
 		return Polycode.SceneMesh_get_lineSmooth(self.__ptr)
 	elseif name == "pointSmooth" then
 		return Polycode.SceneMesh_get_pointSmooth(self.__ptr)
-	elseif name == "ownsMesh" then
-		return Polycode.SceneMesh_get_ownsMesh(self.__ptr)
-	elseif name == "ownsSkeleton" then
-		return Polycode.SceneMesh_get_ownsSkeleton(self.__ptr)
 	elseif name == "useGeometryHitDetection" then
 		return Polycode.SceneMesh_get_useGeometryHitDetection(self.__ptr)
 	elseif name == "alphaTest" then
@@ -37,12 +33,6 @@ function SceneMesh:__setvar(name,value)
 		return true
 	elseif name == "pointSmooth" then
 		Polycode.SceneMesh_set_pointSmooth(self.__ptr, value)
-		return true
-	elseif name == "ownsMesh" then
-		Polycode.SceneMesh_set_ownsMesh(self.__ptr, value)
-		return true
-	elseif name == "ownsSkeleton" then
-		Polycode.SceneMesh_set_ownsSkeleton(self.__ptr, value)
 		return true
 	elseif name == "useGeometryHitDetection" then
 		Polycode.SceneMesh_set_useGeometryHitDetection(self.__ptr, value)
@@ -83,18 +73,6 @@ function SceneMesh:SceneMesh(...)
 	end
 end
 
-function SceneMesh:SceneMeshFromMesh(mesh)
-	local retVal = Polycode.SceneMesh_SceneMeshFromMesh(self.__ptr, mesh.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["SceneMesh"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function SceneMesh:Render(buffer)
-	local retVal = Polycode.SceneMesh_Render(self.__ptr, buffer.__ptr)
-end
-
 function SceneMesh:getShaderPass(index)
 	local retVal = Polycode.SceneMesh_getShaderPass(self.__ptr, index)
 	if retVal == nil then return nil end
@@ -119,7 +97,7 @@ end
 function SceneMesh:getMesh()
 	local retVal =  Polycode.SceneMesh_getMesh(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["Mesh"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Mesh>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end
@@ -127,7 +105,7 @@ end
 function SceneMesh:getMaterial()
 	local retVal =  Polycode.SceneMesh_getMaterial(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["Material"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Material>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end
@@ -135,7 +113,7 @@ end
 function SceneMesh:loadSkeleton(fileName)
 	local retVal = Polycode.SceneMesh_loadSkeleton(self.__ptr, fileName)
 	if retVal == nil then return nil end
-	local __c = _G["Skeleton"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Skeleton>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end
@@ -146,10 +124,6 @@ end
 
 function SceneMesh:setMaterial(material)
 	local retVal = Polycode.SceneMesh_setMaterial(self.__ptr, material.__ptr)
-end
-
-function SceneMesh:setMaterialByName(materialName, resourcePool)
-	local retVal = Polycode.SceneMesh_setMaterialByName(self.__ptr, materialName, resourcePool.__ptr)
 end
 
 function SceneMesh:setMesh(mesh)
@@ -163,13 +137,9 @@ end
 function SceneMesh:getSkeleton()
 	local retVal =  Polycode.SceneMesh_getSkeleton(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["Skeleton"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Skeleton>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
-end
-
-function SceneMesh:applySkeletonLocally()
-	local retVal =  Polycode.SceneMesh_applySkeletonLocally(self.__ptr)
 end
 
 function SceneMesh:setLineWidth(newWidth)
@@ -201,18 +171,6 @@ end
 function SceneMesh:getForceMaterial()
 	local retVal =  Polycode.SceneMesh_getForceMaterial(self.__ptr)
 	return retVal
-end
-
-function SceneMesh:Clone(deepClone, ignoreEditorOnly)
-	local retVal = Polycode.SceneMesh_Clone(self.__ptr, deepClone, ignoreEditorOnly)
-	if retVal == nil then return nil end
-	local __c = _G["Entity"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function SceneMesh:applyClone(clone, deepClone, ignoreEditorOnly)
-	local retVal = Polycode.SceneMesh_applyClone(self.__ptr, clone.__ptr, deepClone, ignoreEditorOnly)
 end
 
 function SceneMesh:__delete()

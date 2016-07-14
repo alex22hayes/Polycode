@@ -25,13 +25,16 @@
 #include "polycode/core/PolyGlobals.h"
 #include "polycode/core/PolyResource.h"
 #include "polycode/core/PolyImage.h"
+#include <memory>
 
 namespace Polycode {
 
 	class _PolyExport Texture : public Resource {
 		public:
-            Texture(unsigned int width, unsigned int height, char *textureData,bool clamp, bool createMipmaps, int type=Image::IMAGE_RGBA, bool framebufferTexture=false);
-			Texture(Image *image);
+			Texture(unsigned int width, unsigned int height, char *textureData,bool clamp, bool createMipmaps, int type, bool framebufferTexture);
+			Texture(Image *image, bool clamp, bool createMipmaps);
+			Texture();
+		
 			virtual ~Texture();
 			
 			void reloadResource();
@@ -47,42 +50,49 @@ namespace Polycode {
 		
 			bool clamp;
 			char *textureData;
-            int type;
-            int filteringMode;
-            bool createMipmaps;
-            unsigned int anisotropy;
-            bool framebufferTexture;
-            bool depthTexture;
-        
-            static const int FILTERING_NEAREST = 0;
-            static const int FILTERING_LINEAR = 1;
-        
+			int type;
+			int filteringMode;
+			bool createMipmaps;
+			unsigned int anisotropy;
+			bool framebufferTexture;
+			bool depthTexture;
+		
+			static const int FILTERING_NEAREST = 0;
+			static const int FILTERING_LINEAR = 1;
+
+			static bool premultiplyAlphaOnLoad;
+			static bool clampDefault;
+			static bool mipmapsDefault;
+			static bool keepTextureData;
+			static int defaultTextureFiltering;
+		
 		protected:
 
 			int pixelSize;
 			int width;
 			int height;
 	};
-    
-    class _PolyExport RenderBuffer {
-        public:
-            RenderBuffer(unsigned int width, unsigned int height, bool attachDepthBuffer, bool floatingPoint);
+	
+	class _PolyExport RenderBuffer {
+		public:
+			RenderBuffer(unsigned int width, unsigned int height, bool attachDepthBuffer, bool floatingPoint);
+			~RenderBuffer();
 
-            unsigned int getWidth();
-            unsigned int getHeight();
-        
-            Texture *colorTexture;
-            Texture *depthTexture;
+			unsigned int getWidth();
+			unsigned int getHeight();
+		
+			std::shared_ptr<Polycode::Texture> colorTexture;
+			std::shared_ptr<Polycode::Texture> depthTexture;
 
-            void *platformData;
-            void *depthBufferPlatformData;
-    
-        private:
-        
-            bool floatingPoint;
-        
-            unsigned int width;
-            unsigned int height;
-    };
-    
+			void *platformData;
+			void *depthBufferPlatformData;
+	
+		private:
+		
+			bool floatingPoint;
+		
+			unsigned int width;
+			unsigned int height;
+	};
+	
 }

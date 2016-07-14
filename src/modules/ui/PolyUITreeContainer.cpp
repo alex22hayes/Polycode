@@ -83,7 +83,7 @@ void UITreeContainer::Resize(Number width, Number height) {
 }
 
 UIScrollContainer *UITreeContainer::getScrollContainer() {
-    return mainContainer;
+	return mainContainer;
 }
 
 void UITreeContainer::handleEvent(Event *event) {
@@ -91,7 +91,7 @@ void UITreeContainer::handleEvent(Event *event) {
 	if(event->getDispatcher() == CoreServices::getInstance()->getCore()->getInput()) {
 		InputEvent *inputEvent = (InputEvent*) event;
 		if(event->getEventCode() == InputEvent::EVENT_KEYDOWN) {
-			onKeyDown(inputEvent->key, inputEvent->charCode);
+			onKeyDown(inputEvent->key);
 		}
 	}
 
@@ -109,7 +109,7 @@ void UITreeContainer::handleEvent(Event *event) {
 		
 		if (!hasFocus) {
 			if (event->getEventCode() == InputEvent::EVENT_MOUSEDOWN) {
-                focusSelf();
+				focusSelf();
 			} else if (event->getEventCode() == InputEvent::EVENT_MOUSEOVER) {
 				CoreServices::getInstance()->getCore()->setCursor(Core::CURSOR_ARROW);
 			}
@@ -129,7 +129,7 @@ UITreeContainer::~UITreeContainer() {
 		delete rootNode;
 		delete mainContainer;
 	}
-	CoreServices::getInstance()->getCore()->getInput()->removeAllHandlersForListener(this);	
+	CoreServices::getInstance()->getCore()->getInput()->removeAllHandlersForListener(this); 
 }
 
 void UITreeContainer::onGainFocus() {
@@ -164,7 +164,7 @@ UITree *UITreeContainer::findNextParentSibling(UITree *parent) {
 //
 // END RECURSIVE HELPER FUNCTIONS
 
-void UITreeContainer::onKeyDown(PolyKEY key, wchar_t charCode) {
+void UITreeContainer::onKeyDown(PolyKEY key) {
 	if (hasFocus) {
 		
 		// KEYBOARD NAV STUFF

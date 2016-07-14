@@ -1,4 +1,7 @@
 function SceneParticle() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.SceneParticle()
+	}
 	Object.defineProperties(this, {
 		'lifetime': { enumerable: true, configurable: true, get: SceneParticle.prototype.__get_lifetime, set: SceneParticle.prototype.__set_lifetime},
 		'position': { enumerable: true, configurable: true, get: SceneParticle.prototype.__get_position, set: SceneParticle.prototype.__set_position},
@@ -11,6 +14,8 @@ function SceneParticle() {
 		'varianceIndex': { enumerable: true, configurable: true, get: SceneParticle.prototype.__get_varianceIndex, set: SceneParticle.prototype.__set_varianceIndex}
 	})
 }
+
+
 SceneParticle.prototype.__get_lifetime = function() {
 	return Polycode.SceneParticle__get_lifetime(this.__ptr)
 }
@@ -20,7 +25,7 @@ SceneParticle.prototype.__set_lifetime = function(val) {
 }
 
 SceneParticle.prototype.__get_position = function() {
-	var retVal = new Vector3()
+	var retVal = new Vector3("__skip_ptr__")
 	retVal.__ptr = 	Polycode.SceneParticle__get_position(this.__ptr)
 	return retVal
 }
@@ -30,7 +35,7 @@ SceneParticle.prototype.__set_position = function(val) {
 }
 
 SceneParticle.prototype.__get_velocity = function() {
-	var retVal = new Vector3()
+	var retVal = new Vector3("__skip_ptr__")
 	retVal.__ptr = 	Polycode.SceneParticle__get_velocity(this.__ptr)
 	return retVal
 }
@@ -40,7 +45,7 @@ SceneParticle.prototype.__set_velocity = function(val) {
 }
 
 SceneParticle.prototype.__get_perlinPos = function() {
-	var retVal = new Vector3()
+	var retVal = new Vector3("__skip_ptr__")
 	retVal.__ptr = 	Polycode.SceneParticle__get_perlinPos(this.__ptr)
 	return retVal
 }
@@ -50,7 +55,7 @@ SceneParticle.prototype.__set_perlinPos = function(val) {
 }
 
 SceneParticle.prototype.__get_rotation = function() {
-	var retVal = new Vector3()
+	var retVal = new Vector3("__skip_ptr__")
 	retVal.__ptr = 	Polycode.SceneParticle__get_rotation(this.__ptr)
 	return retVal
 }
@@ -76,7 +81,7 @@ SceneParticle.prototype.__set_scale = function(val) {
 }
 
 SceneParticle.prototype.__get_color = function() {
-	var retVal = new Color()
+	var retVal = new Color("__skip_ptr__")
 	retVal.__ptr = 	Polycode.SceneParticle__get_color(this.__ptr)
 	return retVal
 }

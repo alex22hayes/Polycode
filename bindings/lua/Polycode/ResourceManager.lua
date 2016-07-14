@@ -23,64 +23,16 @@ function ResourceManager:ResourceManager(...)
 	end
 end
 
-function ResourceManager:getGlobalPool()
-	local retVal =  Polycode.ResourceManager_getGlobalPool(self.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["ResourcePool"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function ResourceManager:getResourcePoolByName(name)
-	local retVal = Polycode.ResourceManager_getResourcePoolByName(self.__ptr, name)
-	if retVal == nil then return nil end
-	local __c = _G["ResourcePool"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function ResourceManager:addResourceLoader(loader)
-	local retVal = Polycode.ResourceManager_addResourceLoader(self.__ptr, loader.__ptr)
-end
-
-function ResourceManager:getResourceLoaderForExtension(extension)
-	local retVal = Polycode.ResourceManager_getResourceLoaderForExtension(self.__ptr, extension)
-	if retVal == nil then return nil end
-	local __c = _G["ResourceLoader"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function ResourceManager:removeResourceLoader(loader)
-	local retVal = Polycode.ResourceManager_removeResourceLoader(self.__ptr, loader.__ptr)
-end
-
 function ResourceManager:getNumResourceLoaders()
 	local retVal =  Polycode.ResourceManager_getNumResourceLoaders(self.__ptr)
 	return retVal
-end
-
-function ResourceManager:getResourceLoaderAtIndex(index)
-	local retVal = Polycode.ResourceManager_getResourceLoaderAtIndex(self.__ptr, index)
-	if retVal == nil then return nil end
-	local __c = _G["ResourceLoader"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function ResourceManager:addResourcePool(pool)
-	local retVal = Polycode.ResourceManager_addResourcePool(self.__ptr, pool.__ptr)
-end
-
-function ResourceManager:removeResourcePool(pool)
-	local retVal = Polycode.ResourceManager_removeResourcePool(self.__ptr, pool.__ptr)
 end
 
 function ResourceManager:getResources(resourceType)
 	local retVal = Polycode.ResourceManager_getResources(self.__ptr, resourceType)
 	if retVal == nil then return nil end
 	for i=1,count(retVal) do
-		local __c  = _G["Resource"]("__skip_ptr__")
+		local __c  = _G["shared_ptr<Resource"]("__skip_ptr__")
 		__c.__ptr = retVal[i]
 		retVal[i] = __c
 	end
@@ -89,14 +41,6 @@ end
 
 function ResourceManager:removeResource(resource)
 	local retVal = Polycode.ResourceManager_removeResource(self.__ptr, resource.__ptr)
-end
-
-function ResourceManager:subscribeToResourcePool(pool)
-	local retVal = Polycode.ResourceManager_subscribeToResourcePool(self.__ptr, pool.__ptr)
-end
-
-function ResourceManager:unsubscibeFromResourcePool(pool)
-	local retVal = Polycode.ResourceManager_unsubscibeFromResourcePool(self.__ptr, pool.__ptr)
 end
 
 function ResourceManager:Update(elapsed)

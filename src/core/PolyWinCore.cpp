@@ -40,8 +40,8 @@
 
 #include <tchar.h>
 
-#include <iostream>   // std::cout
-#include <string>     // std::string, std::to_string
+#include <iostream>	  // std::cout
+#include <string>	  // std::string, std::to_string
 
 #if defined(_MINGW)
 #ifndef MAPVK_VSC_TO_VK_EX
@@ -99,12 +99,12 @@ void Core::getScreenInfo(int *width, int *height, int *hz) {
 	DEVMODE mode = {}; // Zero initialize
 	mode.dmSize = sizeof(DEVMODE);
 	
-    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &mode);
+	EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &mode);
 	
-    // Store the current display settings.
-    if (width) *width = mode.dmPelsWidth;
-    if (height) *height = mode.dmPelsHeight;
-    if (hz) *hz = mode.dmDisplayFrequency;
+	// Store the current display settings.
+	if (width) *width = mode.dmPelsWidth;
+	if (height) *height = mode.dmPelsHeight;
+	if (hz) *hz = mode.dmDisplayFrequency;
 }
 
 Win32Core::Win32Core(PolycodeViewBase *view, int _xRes, int _yRes, bool fullScreen, bool vSync, int aaLevel, int anisotropyLevel, int frameRate,  int monitorIndex, bool retinaSupport) 
@@ -234,13 +234,6 @@ unsigned int Win32Core::getTicks() {
 	return (unsigned int)(li.QuadPart / pcFreq);
 }
 
-void Win32Core::Render() {
-	renderer->beginFrame();
-	services->Render(Polycode::Rectangle(0, 0, getBackingXRes(), getBackingYRes()));
-	renderer->endFrame();
-}
-
-
 void  Win32Core::flushRenderContext() {
 	SwapBuffers(hDC);
 }
@@ -334,6 +327,12 @@ void Win32Core::setVideoMode(int xRes, int yRes, bool fullScreen, bool vSync, in
 	}
 	else {
 
+		bool menu;
+		if (GetMenu(hWnd))
+			menu = true;
+		else
+			menu = false;
+
 		RECT rect;
 		rect.left = 0;
 		rect.top = 0;
@@ -341,11 +340,11 @@ void Win32Core::setVideoMode(int xRes, int yRes, bool fullScreen, bool vSync, in
 		rect.bottom = yRes;
 		if (resizable){
 			SetWindowLongPtr(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_SYSMENU | WS_VISIBLE);
-			AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW | WS_SYSMENU, FALSE);
+			AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW | WS_SYSMENU, menu);
 		}
 		else {
 			SetWindowLongPtr(hWnd, GWL_STYLE, WS_CAPTION | WS_POPUP | WS_SYSMENU | WS_VISIBLE);
-			AdjustWindowRect(&rect, WS_CAPTION | WS_POPUP | WS_SYSMENU, FALSE);
+			AdjustWindowRect(&rect, WS_CAPTION | WS_POPUP | WS_SYSMENU, menu);
 		}
 		MoveWindow(hWnd, 0, 0, rect.right-rect.left, rect.bottom-rect.top, TRUE);
 
@@ -474,7 +473,7 @@ void Win32Core::initContext(int aaLevel) {
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
 		Logger::log("Error initializing glew\n");
-	} else  {
+	} else	{
 		Logger::log("glew initialized successfully\n");
 	}
 
@@ -653,13 +652,12 @@ PolyKEY Win32Core::mapKey(LPARAM lParam, WPARAM wParam) {
 	return keyMap[(unsigned int)wParam];
 }
 
-void Win32Core::handleKeyDown(LPARAM lParam, WPARAM wParam, wchar_t unicodeChar) {
+void Win32Core::handleKeyDown(LPARAM lParam, WPARAM wParam) {
 	lockMutex(eventMutex);
 	Win32Event newEvent;
 	newEvent.eventGroup = Win32Event::INPUT_EVENT;
 	newEvent.eventCode = InputEvent::EVENT_KEYDOWN;
 	newEvent.keyCode = mapKey(lParam, wParam);
-	newEvent.unicodeChar = unicodeChar;
 	win32Events.push_back(newEvent);
 	unlockMutex(eventMutex);
 }
@@ -670,7 +668,6 @@ void Win32Core::handleKeyUp(LPARAM lParam, WPARAM wParam) {
 	newEvent.eventGroup = Win32Event::INPUT_EVENT;
 	newEvent.eventCode = InputEvent::EVENT_KEYUP;
 	newEvent.keyCode = mapKey(lParam, wParam);
-	newEvent.unicodeChar = 0;
 	win32Events.push_back(newEvent);
 	unlockMutex(eventMutex);
 }
@@ -746,10 +743,10 @@ void Win32Core::handlePointerUpdate(LPARAM lParam, WPARAM wParam) {
 
 	lockMutex(eventMutex);
 
-	POINTER_PEN_INFO    penInfo;
-	POINTER_INFO        pointerInfo;
-	UINT32              pointerId = GET_POINTERID_WPARAM(wParam);
-	POINTER_INPUT_TYPE  pointerType = PT_POINTER;
+	POINTER_PEN_INFO	penInfo;
+	POINTER_INFO		pointerInfo;
+	UINT32				pointerId = GET_POINTERID_WPARAM(wParam);
+	POINTER_INPUT_TYPE	pointerType = PT_POINTER;
 	TouchInfo			tempInfo;
 
 	if (!GetPointerType(pointerId, &pointerType))
@@ -816,7 +813,7 @@ void Win32Core::handleMouseMove(LPARAM lParam, WPARAM wParam) {
 	newEvent.eventGroup = Win32Event::INPUT_EVENT;
 	newEvent.eventCode = InputEvent::EVENT_MOUSEMOVE;
 	newEvent.mouseX = GET_X_LPARAM(lParam);
-	newEvent.mouseY = GET_Y_LPARAM(lParam);	
+	newEvent.mouseY = GET_Y_LPARAM(lParam); 
 	win32Events.push_back(newEvent);
 	unlockMutex(eventMutex);
 }
@@ -860,6 +857,19 @@ void Win32Core::handleMouseUp(int mouseCode,LPARAM lParam, WPARAM wParam) {
 	unlockMutex(eventMutex);
 }
 
+void Win32Core::handleTextInput(LPARAM lParam, WPARAM wParam) {
+	Win32Event newEvent;
+	newEvent.eventGroup = Win32Event::INPUT_EVENT;
+	newEvent.text = String(wParam);
+	newEvent.eventCode = InputEvent::EVENT_TEXTINPUT;
+	if ((unsigned char) newEvent.text[0] < ' ' || newEvent.text[0] == 127) {
+		return;
+	}
+	lockMutex(eventMutex);
+	win32Events.push_back(newEvent);
+	unlockMutex(eventMutex);
+}
+
 bool Win32Core::checkSpecialKeyEvents(PolyKEY key) {
 	
 	if(key == KEY_a && (input->getKeyState(KEY_LCTRL) || input->getKeyState(KEY_RCTRL))) {
@@ -883,7 +893,7 @@ bool Win32Core::checkSpecialKeyEvents(PolyKEY key) {
 		return true;
 	}
 		
-	if(key == KEY_z  && (input->getKeyState(KEY_LCTRL) || input->getKeyState(KEY_RCTRL))) {
+	if(key == KEY_z	 && (input->getKeyState(KEY_LCTRL) || input->getKeyState(KEY_RCTRL))) {
 		dispatchEvent(new Event(), Core::EVENT_UNDO);
 		return true;
 	}
@@ -932,11 +942,14 @@ void Win32Core::checkEvents() {
 					break;	
 					case InputEvent::EVENT_KEYDOWN:
 						if(!checkSpecialKeyEvents((event.keyCode))) {
-							input->setKeyState(event.keyCode, (char)event.unicodeChar, true, getTicks());
+							input->setKeyState(event.keyCode, true, getTicks());
 						}
 					break;
 					case InputEvent::EVENT_KEYUP:
-						input->setKeyState(event.keyCode, (char)event.unicodeChar, false, getTicks());
+						input->setKeyState(event.keyCode, false, getTicks());
+					break;
+					case InputEvent::EVENT_TEXTINPUT:
+						input->textInput(event.text);
 					break;
 				}
 			break;
@@ -1092,7 +1105,7 @@ void Win32Core::detectGamepads() {
 		info.dwFlags = JOY_RETURNALL;
 		joystickID = JOYSTICKID1 + deviceIndex;
 		if (joyGetPosEx(joystickID, &info) == JOYERR_NOERROR &&
-		    joyGetDevCaps(joystickID, &caps, sizeof(JOYCAPS)) == JOYERR_NOERROR) {
+			joyGetDevCaps(joystickID, &caps, sizeof(JOYCAPS)) == JOYERR_NOERROR) {
 			
 			duplicate = false;
 			for (deviceIndex2 = 0; deviceIndex2 < gamepads.size(); deviceIndex2++) {
@@ -1210,7 +1223,7 @@ void Win32Core::platformSleep(int msecs) {
 
 CoreMutex *Win32Core::createMutex() {
 	Win32Mutex *newMutex = new Win32Mutex();
-	newMutex->winMutex = CreateMutex(  NULL, FALSE, NULL);   
+	newMutex->winMutex = CreateMutex(  NULL, FALSE, NULL);	 
 	return newMutex;
 }
 		
@@ -1423,25 +1436,25 @@ void Win32Core::openURL(String url) {
 
 String error_to_string(const DWORD a_error_code)
 {
-    // Get the last windows error message.
-    wchar_t msg_buf[1025] = { 0 };
+	// Get the last windows error message.
+	wchar_t msg_buf[1025] = { 0 };
 
-    // Get the error message for our os code.
-    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 
-                      0,
-                      a_error_code,
-                      0,
-                      msg_buf,
-                      sizeof(msg_buf) - 1,
-                      0))
-    {
-     
+	// Get the error message for our os code.
+	if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 
+					  0,
+					  a_error_code,
+					  0,
+					  msg_buf,
+					  sizeof(msg_buf) - 1,
+					  0))
+	{
+	 
 
 
-        return String(msg_buf);
-    }
+		return String(msg_buf);
+	}
 
-    return String("Failed to get error message");
+	return String("Failed to get error message");
 }
 						
 void Win32Core::copyDiskItem(const String& itemPath, const String& destItemPath) {
@@ -1552,7 +1565,7 @@ void  Win32Core::copyStringToClipboard(const String& str) {
 	std::wstring wstr = _tmp.getWDataWithEncoding(String::ENCODING_UTF8);
 
 	const size_t len = ((wstr.size()+1) * sizeof(wchar_t));
-	HGLOBAL hMem =  GlobalAlloc(GMEM_MOVEABLE, len);
+	HGLOBAL hMem =	GlobalAlloc(GMEM_MOVEABLE, len);
 	memcpy(GlobalLock(hMem), (char*)wstr.c_str(), len);
 	GlobalUnlock(hMem);
 	OpenClipboard(0);

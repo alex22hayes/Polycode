@@ -31,57 +31,13 @@ end
 function SceneRenderTexture:getTargetTexture()
 	local retVal =  Polycode.SceneRenderTexture_getTargetTexture(self.__ptr)
 	if retVal == nil then return nil end
-	local __c = _G["Texture"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function SceneRenderTexture:getFilterColorBufferTexture()
-	local retVal =  Polycode.SceneRenderTexture_getFilterColorBufferTexture(self.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["Texture"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function SceneRenderTexture:getFilterZBufferTexture()
-	local retVal =  Polycode.SceneRenderTexture_getFilterZBufferTexture(self.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["Texture"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function SceneRenderTexture:Render()
-	local retVal =  Polycode.SceneRenderTexture_Render(self.__ptr)
-end
-
-function SceneRenderTexture:saveToImage()
-	local retVal =  Polycode.SceneRenderTexture_saveToImage(self.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["Image"]("__skip_ptr__")
+	local __c = _G["shared_ptr<Texture>"]("__skip_ptr__")
 	__c.__ptr = retVal
 	return __c
 end
 
 function SceneRenderTexture:resizeRenderTexture(newWidth, newHeight)
 	local retVal = Polycode.SceneRenderTexture_resizeRenderTexture(self.__ptr, newWidth, newHeight)
-end
-
-function SceneRenderTexture:getTargetScene()
-	local retVal =  Polycode.SceneRenderTexture_getTargetScene(self.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["Scene"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
-end
-
-function SceneRenderTexture:getTargetCamera()
-	local retVal =  Polycode.SceneRenderTexture_getTargetCamera(self.__ptr)
-	if retVal == nil then return nil end
-	local __c = _G["Camera"]("__skip_ptr__")
-	__c.__ptr = retVal
-	return __c
 end
 
 function SceneRenderTexture:__delete()

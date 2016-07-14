@@ -1,5 +1,14 @@
-function SceneLine() {
+require('Polycode/SceneMesh')
+
+function SceneLine(startp,endp) {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.SceneLine(startp,endp)
+	}
 }
+
+
+SceneLine.prototype = Object.create(SceneMesh.prototype)
+
 
 SceneLine.prototype.setStart = function(startp) {
 	Polycode.SceneLine_setStart(this.__ptr, startp)

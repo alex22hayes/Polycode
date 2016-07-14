@@ -89,11 +89,11 @@
 #define VK_PERIOD	0xBE
 #define VK_SLASH	0xBF
 #define VK_GRAVE	0xC0
-#define VK_LBRACKET	0xDB
+#define VK_LBRACKET 0xDB
 #define VK_BACKSLASH	0xDC
-#define VK_RBRACKET	0xDD
+#define VK_RBRACKET 0xDD
 #define VK_APOSTROPHE	0xDE
-#define VK_BACKTICK	0xDF
+#define VK_BACKTICK 0xDF
 #define VK_OEM_102	0xE2
 
 #define EXTENDED_KEYMASK	(1<<24)
@@ -128,7 +128,7 @@ namespace Polycode {
 		std::vector<TouchInfo> touches;
 		int touchType;
 		PolyKEY keyCode;
-		wchar_t unicodeChar;		
+		String text;
 		char mouseButton;	
 		static const int EVENTBASE_PLATFORMEVENT = 0x300;
 		static const int INPUT_EVENT = EVENTBASE_PLATFORMEVENT+0;
@@ -186,7 +186,7 @@ public:
 		
 	public:
 		
-		Win32Core(PolycodeViewBase *view, int xRes, int yRes, bool fullScreen, bool vSync, int aaLevel, int anisotropyLevel, int frameRate,  int monitorIndex = -1, bool retinaSupport = false);
+		Win32Core(PolycodeViewBase *view, int xRes, int yRes, bool fullScreen, bool vSync, int aaLevel, int anisotropyLevel, int frameRate,	 int monitorIndex = -1, bool retinaSupport = false);
 		~Win32Core();
 
 		void enableMouse(bool newval);
@@ -194,10 +194,9 @@ public:
 		void warpCursor(int x, int y);
 		unsigned int getTicks();		
 		bool systemUpdate();
-		void Render();
 		void setVSync(bool vSyncVal);
 
-		void handleKeyDown(LPARAM lParam, WPARAM wParam, wchar_t unicodeChar);
+		void handleKeyDown(LPARAM lParam, WPARAM wParam);
 		void handleKeyUp(LPARAM lParam, WPARAM wParam);
 		void handleMouseMove(LPARAM lParam, WPARAM wParam);
 		void handleMouseWheel(LPARAM lParam, WPARAM wParam);
@@ -205,6 +204,7 @@ public:
 		void handleMouseUp(int mouseCode,LPARAM lParam, WPARAM wParam);
 		void handleTouchEvent(LPARAM lParam, WPARAM wParam);
 		void handlePointerUpdate(LPARAM lParam, WPARAM wParam);
+		void handleTextInput(LPARAM lParam, WPARAM wParam);
 
 		void handleVideoModeChange(VideoModeChangeInfo *modeInfo);
 

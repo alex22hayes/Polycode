@@ -1,30 +1,19 @@
+require('Polycode/SceneMesh')
+
 function SceneSprite() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.SceneSprite()
+	}
 }
 
-SceneSprite.prototype.Clone = function(deepClone,ignoreEditorOnly) {
-	var retVal = new Entity()
-	retVal.__ptr = Polycode.SceneSprite_Clone(this.__ptr, deepClone,ignoreEditorOnly)
-	return retVal
-}
 
-SceneSprite.prototype.applyClone = function(clone,deepClone,ignoreEditorOnly) {
-	Polycode.SceneSprite_applyClone(this.__ptr, clone,deepClone,ignoreEditorOnly)
-}
+SceneSprite.prototype = Object.create(SceneMesh.prototype)
 
-SceneSprite.prototype.getSpriteSet = function() {
-	var retVal = new SpriteSet()
-	retVal.__ptr = Polycode.SceneSprite_getSpriteSet(this.__ptr)
-	return retVal
-}
 
 SceneSprite.prototype.getCurrentSprite = function() {
-	var retVal = new Sprite()
+	var retVal = new Sprite("__skip_ptr__")
 	retVal.__ptr = Polycode.SceneSprite_getCurrentSprite(this.__ptr)
 	return retVal
-}
-
-SceneSprite.prototype.setSpriteSet = function(spriteSet) {
-	Polycode.SceneSprite_setSpriteSet(this.__ptr, spriteSet)
 }
 
 SceneSprite.prototype.setSpriteByName = function(spriteName) {
@@ -43,12 +32,8 @@ SceneSprite.prototype.Update = function() {
 	Polycode.SceneSprite_Update(this.__ptr)
 }
 
-SceneSprite.prototype.Render = function(buffer) {
-	Polycode.SceneSprite_Render(this.__ptr, buffer)
-}
-
 SceneSprite.prototype.getSpriteBoundingBox = function() {
-	var retVal = new Vector3()
+	var retVal = new Vector3("__skip_ptr__")
 	retVal.__ptr = Polycode.SceneSprite_getSpriteBoundingBox(this.__ptr)
 	return retVal
 }
@@ -65,18 +50,8 @@ SceneSprite.prototype.setSprite = function(spriteEntry) {
 	Polycode.SceneSprite_setSprite(this.__ptr, spriteEntry)
 }
 
-SceneSprite.prototype.setSpriteState = function(spriteState,startingFrame,playOnce) {
-	Polycode.SceneSprite_setSpriteState(this.__ptr, spriteState,startingFrame,playOnce)
-}
-
 SceneSprite.prototype.setSpriteStateByName = function(name,startingFrame,playOnce) {
-	Polycode.SceneSprite_setSpriteStateByName(this.__ptr, name,startingFrame,playOnce)
-}
-
-SceneSprite.prototype.getCurrentSpriteState = function() {
-	var retVal = new SpriteState()
-	retVal.__ptr = Polycode.SceneSprite_getCurrentSpriteState(this.__ptr)
-	return retVal
+	Polycode.SceneSprite_setSpriteStateByName(this.__ptr, name, startingFrame, playOnce)
 }
 
 SceneSprite.prototype.getStartOnRandomFrame = function() {

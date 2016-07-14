@@ -41,9 +41,9 @@ class PropProp : public UIElement {
 		virtual void setPropData(PolycodeEditorPropActionData* data) {}
 		
 		virtual void setPropWidth(Number width) {}
-        virtual void updateFocusVisibility() {}
-        void setPropName(String newName);
-    
+		virtual void updateFocusVisibility() {}
+		void setPropName(String newName);
+	
 		String propType;
 		UILabel *label;
 		UIElement *propContents;
@@ -53,28 +53,28 @@ class PropProp : public UIElement {
 };
 
 class Vector3Prop : public PropProp {
-    public:
-        Vector3Prop(String caption, UIElement *focusParent);
-        ~Vector3Prop();
-        void handleEvent(Event *event);
-        void set(const Vector3 &position);
+	public:
+		Vector3Prop(String caption, UIElement *focusParent);
+		~Vector3Prop();
+		void handleEvent(Event *event);
+		void set(const Vector3 &position);
 
-        Vector3 get() const;
-        void setPropData(PolycodeEditorPropActionData* data);
-        
-        void setPropWidth(Number width);
-        
-        UITextInput *xInput;
-        UITextInput *yInput;
-        UITextInput *zInput;
-        
-        UILabel *labelX;
-        UILabel *labelY;
-        UILabel *labelZ;
-    
-        Vector3 lastData;
-        Vector3 currentData;
-    
+		Vector3 get() const;
+		void setPropData(PolycodeEditorPropActionData* data);
+		
+		void setPropWidth(Number width);
+		
+		UITextInput *xInput;
+		UITextInput *yInput;
+		UITextInput *zInput;
+		
+		UILabel *labelX;
+		UILabel *labelY;
+		UILabel *labelZ;
+	
+		Vector3 lastData;
+		Vector3 currentData;
+	
 };
 
 
@@ -91,7 +91,7 @@ class Vector2Prop : public PropProp {
 		void setPropWidth(Number width);		
 				
 		UITextInput *positionX;
-		UITextInput *positionY;	
+		UITextInput *positionY; 
 		
 		Vector2 lastData;
 		Vector2 currentData;	
@@ -119,15 +119,15 @@ class SliderProp : public PropProp {
 };
 
 class ButtonProp : public PropProp {
-    public:
-        ButtonProp(const String &caption, UIElement *focusParent);
-        ~ButtonProp();
-        void setPropWidth(Number width);
-        UIButton *getButton();
-    
-    private:
-    
-        UIButton *button;
+	public:
+		ButtonProp(const String &caption, UIElement *focusParent);
+		~ButtonProp();
+		void setPropWidth(Number width);
+		UIButton *getButton();
+	
+	private:
+	
+		UIButton *button;
 };
 
 
@@ -138,10 +138,10 @@ class NumberProp : public PropProp {
 		void handleEvent(Event *event);
 		void set(Number number);
 		Number get();
-    
+	
 		void setPropWidth(Number width);
-        void updateFocusVisibility();
-    
+		void updateFocusVisibility();
+	
 		void setPropData(PolycodeEditorPropActionData* data);
 				
 		UITextInput *numberEntry;
@@ -153,16 +153,16 @@ class NumberProp : public PropProp {
 class TargetBindingProp : public PropProp {
 	public:
 
-		TargetBindingProp(Shader *shader, Material *material, ShaderBinding *binding, RenderTargetBinding *targetBinding);
+		TargetBindingProp(std::shared_ptr<Shader> shader, std::shared_ptr<Material> material, std::shared_ptr<ShaderBinding> binding, RenderTargetBinding *targetBinding);
 		~TargetBindingProp();
 
-		void handleEvent(Event *event);	
+		void handleEvent(Event *event); 
 		void setPropWidth(Number width);
 						
 		RenderTargetBinding *targetBinding;
-		Material *material;
-		Shader *shader;
-		ShaderBinding *binding;
+		std::shared_ptr<Material> material;
+		std::shared_ptr<Shader> shader;
+		std::shared_ptr<ShaderBinding> binding;
 		
 		UIComboBox *typeComboBox;
 		UIComboBox *targetComboBox;
@@ -173,15 +173,15 @@ class TargetBindingProp : public PropProp {
 
 class RenderTargetProp : public PropProp {
 	public:
-		RenderTargetProp(ShaderRenderTarget *renderTarget, Material *material);
+		RenderTargetProp(ShaderRenderTarget *renderTarget, std::shared_ptr<Material> material);
 		~RenderTargetProp();
 
-		void handleEvent(Event *event);	
+		void handleEvent(Event *event); 
 		void setPropWidth(Number width);
 		
 		void recreateRenderTarget();
 		
-		Material *material;
+		std::shared_ptr<Material> material;
 		ShaderRenderTarget *renderTarget;
 		
 		UITextInput *nameInput;		
@@ -193,14 +193,14 @@ class RenderTargetProp : public PropProp {
 
 class ShaderPassProp : public PropProp {
 	public:
-		ShaderPassProp(Material *material, int shaderIndex);
+		ShaderPassProp(std::shared_ptr<Material> material, int shaderIndex);
 		~ShaderPassProp();
 		
-		void handleEvent(Event *event);	
+		void handleEvent(Event *event); 
 		void setPropWidth(Number width);
 		
-		Material *material;
-		Shader *shader;		
+		std::shared_ptr<Material> material;
+		std::shared_ptr<Shader> shader;		
 		int shaderIndex;
 		UIComboBox *shaderComboBox;		
 		UIImageButton *removeButton;
@@ -211,42 +211,42 @@ class ShaderPassProp : public PropProp {
 
 class RemovableStringProp : public PropProp {
 public:
-    RemovableStringProp(const String &caption);
-    ~RemovableStringProp();
-    void handleEvent(Event *event);
-    
-    String getCaption();
-    
-    UILabel *label;
-    UIImageButton *removeButton;
+	RemovableStringProp(const String &caption);
+	~RemovableStringProp();
+	void handleEvent(Event *event);
+	
+	String getCaption();
+	
+	UILabel *label;
+	UIImageButton *removeButton;
 };
 
 
 class LayerProp : public PropProp {
-    public:
-        LayerProp(SceneEntityInstance *instance, SceneEntityInstanceLayer *layer);
-        ~LayerProp();
-        void handleEvent(Event *event);
-        void setPropWidth(Number width);
-    
-        void setInstance(SceneEntityInstance *instance);
-    
-    private:
-    
-        SceneEntityInstance *instance;
-        SceneEntityInstanceLayer *layer;
-        UILabel *layerName;
-        UIImageButton *hideLayerButton;
-        UIImageButton *showLayerButton;
-        UIImageButton *moreButton;
-    
-        UIMenu *menu;
-    
-        UIImageButton *removeLayerButton;
-    
+	public:
+		LayerProp(SceneEntityInstance *instance, SceneEntityInstanceLayer *layer);
+		~LayerProp();
+		void handleEvent(Event *event);
+		void setPropWidth(Number width);
+	
+		void setInstance(SceneEntityInstance *instance);
+	
+	private:
+	
+		SceneEntityInstance *instance;
+		SceneEntityInstanceLayer *layer;
+		UILabel *layerName;
+		UIImageButton *hideLayerButton;
+		UIImageButton *showLayerButton;
+		UIImageButton *moreButton;
+	
+		UIMenu *menu;
+	
+		UIImageButton *removeLayerButton;
+	
 		unsigned char layerID;
-    
-        UIRect *bgRect;
+	
+		UIRect *bgRect;
 };
 
 class CustomProp : public PropProp {
@@ -255,7 +255,7 @@ class CustomProp : public PropProp {
 		~CustomProp();
 		void handleEvent(Event *event);
 		void set(String key, String val);
-		void setPropWidth(Number width);    
+		void setPropWidth(Number width);	
 		String getValue();
 		String getKey();
 				
@@ -360,7 +360,7 @@ class BezierRGBACurveProp : public PropProp {
 		BezierRGBACurveProp(String caption);
 		~BezierRGBACurveProp();
 
-		void handleEvent(Event *event);	
+		void handleEvent(Event *event); 
 		
 		BezierCurve *curveR;
 		BezierCurve *curveG;
@@ -374,7 +374,7 @@ class BezierCurveProp : public PropProp {
 		BezierCurveProp(String caption, String curveName);
 		~BezierCurveProp();
 
-		void handleEvent(Event *event);	
+		void handleEvent(Event *event); 
 		
 		String curveName;
 		BezierCurve *curve;
@@ -382,42 +382,44 @@ class BezierCurveProp : public PropProp {
 };
 
 class MaterialProp : public PropProp {
-    public:
-        MaterialProp(const String &caption);
-        ~MaterialProp();
-    
-        void setEntityInstance(SceneEntityInstance *instance);
-        void set(Material *material);
-        Material *get();
+	public:
+		MaterialProp(const String &caption);
+		~MaterialProp();
+	
+		void Render(GPUDrawBuffer *buffer);
+	
+		void setEntityInstance(SceneEntityInstance *instance);
+		void set(std::shared_ptr<Material> material);
+		std::shared_ptr<Material> get();
 		void setPropWidth(Number width);
-        void handleEvent(Event *event);
-    
-    private:
-    
-        Scene *previewScene;
-        SceneLight *mainLight;
-        SceneLight *secondLight;
-        SceneRenderTexture *renderTexture;
-        ScenePrimitive *previewPrimitive;
-    
-    
-        SceneEntityInstance *entityInstance;
-        UIRect *previewShape;
-        UIButton *changeButton;
-        UILabel *materialLabel;
-    
-        Material *currentMaterial;
+		void handleEvent(Event *event);
+	
+	private:
+	
+		Scene *previewScene;
+		SceneLight *mainLight;
+		SceneLight *secondLight;
+		SceneRenderTexture *renderTexture;
+		ScenePrimitive *previewPrimitive;
+	
+	
+		SceneEntityInstance *entityInstance;
+		UIRect *previewShape;
+		UIButton *changeButton;
+		UILabel *materialLabel;
+	
+		std::shared_ptr<Material> currentMaterial;
 };
 
 class TextureProp : public PropProp {
 	public:
 		TextureProp(String caption);
 		~TextureProp();
-		void handleEvent(Event *event);	
+		void handleEvent(Event *event); 
 		void setPropWidth(Number width);
 				
-		void set(Texture *texture);
-		Texture* get();
+		void set(std::shared_ptr<Texture> texture);
+		std::shared_ptr<Texture> get();
 		
 		void setPropData(PolycodeEditorPropActionData* data);
 				
@@ -437,20 +439,20 @@ class SceneSpriteProp : public PropProp {
 		
 		void setPropData(PolycodeEditorPropActionData* data);
 		
-        void setEntityInstance(SceneEntityInstance *instance);
-    
-		void set(Sprite *sprite);
-		Sprite *get();
+		void setEntityInstance(SceneEntityInstance *instance);
+	
+		void set(std::shared_ptr<Sprite> sprite);
+		 std::shared_ptr<Sprite> get();
 				
-        SceneEntityInstance *entityInstance;
-    
-        Sprite *sprite;
+		SceneEntityInstance *entityInstance;
+	
+		std::shared_ptr<Sprite> sprite;
 		SceneSprite *previewSprite;
 		UIButton *changeButton;
-        UILabel *spriteName;
-    
-        Sprite *lastData;
-		Sprite *currentData;
+		UILabel *spriteName;
+	
+		std::shared_ptr<Sprite>lastData;
+		std::shared_ptr<Sprite>currentData;
 };
 
 class SceneEntityInstanceProp : public PropProp {
@@ -480,8 +482,8 @@ class PropSheet : public UIElement {
 		
 		virtual void applyPropActionData(PolycodeEditorPropActionData *data);
 		void handleEvent(Event *event);
-    
-        void layoutProps();
+	
+		void layoutProps();
 		
 		void setCollapsed(bool val);
 		
@@ -517,32 +519,32 @@ class ShaderOptionsSheet : public PropSheet {
 		
 		void clearShader();
 		void setOptionsFromParams(std::vector<ProgramParam> &params);
-		void setShader(Shader *shader, Material *material, ShaderBinding *binding);
+		void setShader(std::shared_ptr<Shader> shader, std::shared_ptr<Material> material, std::shared_ptr<ShaderBinding> binding);
 				
 	private:
-		Shader *shader;
-		Material *material;
-		ShaderBinding *binding;
+		std::shared_ptr<Shader> shader;
+		std::shared_ptr<Material> material;
+		std::shared_ptr<ShaderBinding> binding;
 		
 };
 
 class EntitySheet : public PropSheet {
 	public:
 		EntitySheet();
-		~EntitySheet();	
+		~EntitySheet(); 
 	
 		void handleEvent(Event *event);
-        void setEntity(Entity *entity);
-    
-        void refreshLayers();
-    
-        void setEntityInstance(SceneEntityInstance *instance);
+		void setEntity(Entity *entity);
+	
+		void refreshLayers();
+	
+		void setEntityInstance(SceneEntityInstance *instance);
 
-    protected:
+	protected:
 		Entity *entity;
 		
-        SceneEntityInstance *instance;
-        ComboProp *layersProp;
+		SceneEntityInstance *instance;
+		ComboProp *layersProp;
 		StringProp *idProp;
 		StringProp *tagProp;
 		ColorProp *colorProp;
@@ -559,15 +561,15 @@ class ShaderPassesSheet : public PropSheet {
 		
 		void Update();
 		
-		void setMaterial(Material *material);
+		void setMaterial(std::shared_ptr<Material> material);
 
-		ShaderBinding *binding;
-		Material *material;
+		std::shared_ptr<ShaderBinding> binding;
+		std::shared_ptr<Material> material;
 
 		ShaderPassProp *selectedProp;
 
-        ResourcePool *resourcePool;
-    
+		ResourcePool *resourcePool;
+	
 		ButtonProp *addButton;
 		int removeIndex;		
 };
@@ -577,15 +579,15 @@ class TargetBindingsSheet : public PropSheet {
 		TargetBindingsSheet();
 		~TargetBindingsSheet();
 		void handleEvent(Event *event);				
-		void setShader(Shader *shader, Material *material, ShaderBinding *binding);
+		void setShader(std::shared_ptr<Shader> shader, std::shared_ptr<Material> material, std::shared_ptr<ShaderBinding> binding);
 		
 		void Update();
 		
 		void refreshTargets();
 		
-		ShaderBinding *binding;
-		Material *material;
-		Shader *shader;
+		std::shared_ptr<ShaderBinding> binding;
+		std::shared_ptr<Material> material;
+		std::shared_ptr<Shader> shader;
 		int shaderIndex;
 		
 		ButtonProp *addButton;
@@ -602,9 +604,9 @@ class RenderTargetsSheet : public PropSheet {
 		
 		void refreshTargets();
 		
-		ShaderBinding *binding;
-		Material *material;
-		Material *lastMaterial;
+		std::shared_ptr<ShaderBinding> binding;
+		std::shared_ptr<Material> material;
+		std::shared_ptr<Material> lastMaterial;
 		
 		Number normTextureWidth;
 		Number normTextureHeight;
@@ -614,149 +616,149 @@ class RenderTargetsSheet : public PropSheet {
 };
 
 class TransformSheet : public PropSheet {
-    public:
-        TransformSheet();
-        ~TransformSheet();
-    
-        void Update();
-    
-        void setEntity(Entity *entity);
-        void handleEvent(Event *event);
-    
-    protected:
-        Entity *entity;
-    
-        Vector3Prop *positionProp;
-        Vector3Prop *scaleProp;
-        Vector3Prop *rotationProp;
-    
-        Vector3 lastPosition;
-        Vector3 lastScale;
-        Vector3 lastRotation;
+	public:
+		TransformSheet();
+		~TransformSheet();
+	
+		void Update();
+	
+		void setEntity(Entity *entity);
+		void handleEvent(Event *event);
+	
+	protected:
+		Entity *entity;
+	
+		Vector3Prop *positionProp;
+		Vector3Prop *scaleProp;
+		Vector3Prop *rotationProp;
+	
+		Vector3 lastPosition;
+		Vector3 lastScale;
+		Vector3 lastRotation;
 };
 
 class ParticleEmitterSheet : public PropSheet {
-    public:
-        ParticleEmitterSheet();
-        ~ParticleEmitterSheet();
-    
-        void handleEvent(Event *event);
-        void setParticleEmitter(SceneParticleEmitter *emitter);
-    
-    protected:
-        SceneParticleEmitter *emitter;
-    
-        ComboProp *typeProp;
-        NumberProp *countProp;
-        NumberProp *lifetimeProp;
-        NumberProp *particleSizeProp;
-        NumberProp *particleSpeedProp;
+	public:
+		ParticleEmitterSheet();
+		~ParticleEmitterSheet();
+	
+		void handleEvent(Event *event);
+		void setParticleEmitter(SceneParticleEmitter *emitter);
+	
+	protected:
+		SceneParticleEmitter *emitter;
+	
+		ComboProp *typeProp;
+		NumberProp *countProp;
+		NumberProp *lifetimeProp;
+		NumberProp *particleSizeProp;
+		NumberProp *particleSpeedProp;
 
-        BoolProp *worldParticlesProp;
-        BoolProp *loopingProp;
+		BoolProp *worldParticlesProp;
+		BoolProp *loopingProp;
 
-        Vector3Prop *particleRotaionProp;
-    
-        Vector3Prop *gravityProp;
-        Vector3Prop *directionProp;
-        Vector3Prop *sizeProp;
-        Vector3Prop *deviationProp;
-    
-        BoolProp *perlinProp;
-        Vector3Prop *perlinSizeProp;
-    
-        BoolProp *useColorCurvesProp;
-        BezierRGBACurveProp *colorCurveProp;
+		Vector3Prop *particleRotaionProp;
+	
+		Vector3Prop *gravityProp;
+		Vector3Prop *directionProp;
+		Vector3Prop *sizeProp;
+		Vector3Prop *deviationProp;
+	
+		BoolProp *perlinProp;
+		Vector3Prop *perlinSizeProp;
+	
+		BoolProp *useColorCurvesProp;
+		BezierRGBACurveProp *colorCurveProp;
 
-        BoolProp *useScaleCurvesProp;
-        BezierCurveProp *scaleCurveProp;
+		BoolProp *useScaleCurvesProp;
+		BezierCurveProp *scaleCurveProp;
 
 };
 
 class SceneLightSheet : public PropSheet {
-    public:
-        SceneLightSheet();
-        ~SceneLightSheet();
-    
-        void updateOptionVisibility();
-    
-        void setSceneLight(SceneLight *light);
-        void handleEvent(Event *event);
-    
-    protected:
-    
-        SceneLight *light;
-    
-        ComboProp *typeProp;
-        NumberProp *importanceProp;
-        ColorProp *lightColorProp;
-        ColorProp *specularColorProp;
-        NumberProp *intensityProp;
-        SliderProp *constantAttenuationProp;
-        SliderProp *linearAttenuationProp;
-        SliderProp *quadraticAttenuationProp;
-    
-        SliderProp *spotlightCutoffProp;
-        SliderProp *spotlightExponentProp;
-    
-        BoolProp *castShadowsProp;
-        SliderProp *shadowMapFOVProp;
-        NumberProp *shadowResolutionProp;
+	public:
+		SceneLightSheet();
+		~SceneLightSheet();
+	
+		void updateOptionVisibility();
+	
+		void setSceneLight(SceneLight *light);
+		void handleEvent(Event *event);
+	
+	protected:
+	
+		SceneLight *light;
+	
+		ComboProp *typeProp;
+		NumberProp *importanceProp;
+		ColorProp *lightColorProp;
+		ColorProp *specularColorProp;
+		NumberProp *intensityProp;
+		SliderProp *constantAttenuationProp;
+		SliderProp *linearAttenuationProp;
+		SliderProp *quadraticAttenuationProp;
+	
+		SliderProp *spotlightCutoffProp;
+		SliderProp *spotlightExponentProp;
+	
+		BoolProp *castShadowsProp;
+		SliderProp *shadowMapFOVProp;
+		NumberProp *shadowResolutionProp;
 };
 
 class SceneMeshSheet : public PropSheet {
-    public:
-        SceneMeshSheet();
-        ~SceneMeshSheet();
-    
-        void setSceneMesh(SceneMesh *mesh);
-        void handleEvent(Event *event);
-    
-    private:
-    
-        BoolProp *gpuSkinningProp;
-        BoolProp *backfaceCullProp;
-        BoolProp *alphaTestProp;
-    
-        SceneMesh *sceneMesh;
+	public:
+		SceneMeshSheet();
+		~SceneMeshSheet();
+	
+		void setSceneMesh(SceneMesh *mesh);
+		void handleEvent(Event *event);
+	
+	private:
+	
+		BoolProp *gpuSkinningProp;
+		BoolProp *backfaceCullProp;
+		BoolProp *alphaTestProp;
+	
+		SceneMesh *sceneMesh;
 };
 
 
 class ScenePrimitiveSheet : public PropSheet {
 public:
-    ScenePrimitiveSheet();
-    ~ScenePrimitiveSheet();
-    
-    void setScenePrimitive(ScenePrimitive *primitive);
-    void handleEvent(Event *event);
-    
+	ScenePrimitiveSheet();
+	~ScenePrimitiveSheet();
+	
+	void setScenePrimitive(ScenePrimitive *primitive);
+	void handleEvent(Event *event);
+	
 protected:
-    
-    void updatePrimitiveLabels();
-    
-    ScenePrimitive *primitive;
-    ComboProp *typeProp;
-    
-    NumberProp *option1Prop;
-    NumberProp *option2Prop;
-    NumberProp *option3Prop;
-    NumberProp *option4Prop;
-    NumberProp *option5Prop;
+	
+	void updatePrimitiveLabels();
+	
+	ScenePrimitive *primitive;
+	ComboProp *typeProp;
+	
+	NumberProp *option1Prop;
+	NumberProp *option2Prop;
+	NumberProp *option3Prop;
+	NumberProp *option4Prop;
+	NumberProp *option5Prop;
 };
 
 class MaterialPropSheet : public PropSheet {
-    public:
-        MaterialPropSheet();
-        ~MaterialPropSheet();
-    
-        void setEntityInstance(SceneEntityInstance *instance);
-        void handleEvent(Event *event);
-        void setSceneMesh(SceneMesh *sceneMesh);
-    
-    protected:
-    
-        MaterialProp *materialProp;
-        SceneMesh *sceneMesh;
+	public:
+		MaterialPropSheet();
+		~MaterialPropSheet();
+	
+		void setEntityInstance(SceneEntityInstance *instance);
+		void handleEvent(Event *event);
+		void setSceneMesh(SceneMesh *sceneMesh);
+	
+	protected:
+	
+		MaterialProp *materialProp;
+		SceneMesh *sceneMesh;
 };
 
 class EntityPropSheet : public PropSheet {
@@ -766,12 +768,12 @@ class EntityPropSheet : public PropSheet {
 		void Update();
 		void refreshProps();
 		void applyPropActionData(PolycodeEditorPropActionData *data);
-        void setEntity(Entity *entity);
+		void setEntity(Entity *entity);
 
-        ButtonProp *addButtonProp;
+		ButtonProp *addButtonProp;
 		
 		Entity *entity;
-    
+	
 		int lastNumProps;		
 		int removeIndex;
 };
@@ -783,33 +785,33 @@ class SceneLabelSheet : public PropSheet {
 		
 		void refreshFonts();
 		void handleEvent(Event *event);
-    
-        void setSceneLabel(SceneLabel *label);
+	
+		void setSceneLabel(SceneLabel *label);
 		
-    
-    private:
+	
+	private:
 		SceneLabel *label;
 				
 		StringProp *caption;
 		NumberProp *size;
-        NumberProp *actualHeight;
+		NumberProp *actualHeight;
 		ComboProp *font;
 		BoolProp *enableAA;
 };
 
 class SceneCurveSheet : public PropSheet {
-    public:
-        SceneCurveSheet();
-        ~SceneCurveSheet();
-    
-        void handleEvent(Event *event);
-        void setCurve(SceneCurve *curve);
-    
-        SceneCurve *curve;
-        ButtonProp *addPointProp;
-        BoolProp *renderProp;
-        NumberProp *numPointsProp;
-    
+	public:
+		SceneCurveSheet();
+		~SceneCurveSheet();
+	
+		void handleEvent(Event *event);
+		void setCurve(SceneCurve *curve);
+	
+		SceneCurve *curve;
+		ButtonProp *addPointProp;
+		BoolProp *renderProp;
+		NumberProp *numPointsProp;
+	
 };
 
 class SceneSpriteSheet : public PropSheet {
@@ -818,40 +820,40 @@ class SceneSpriteSheet : public PropSheet {
 		~SceneSpriteSheet();
 		
 		void handleEvent(Event *event);
-        void setSprite(SceneSprite *sprite);
-    
-        void setEntityInstance(SceneEntityInstance *instance);
+		void setSprite(SceneSprite *sprite);
+	
+		void setEntityInstance(SceneEntityInstance *instance);
 				
 		SceneSprite *sprite;
-    
-        SceneSpriteProp *spriteProp;
-        BoolProp *randomFrameProp;
-        ComboProp *defaultStateProp;
+	
+		SceneSpriteProp *spriteProp;
+		BoolProp *randomFrameProp;
+		ComboProp *defaultStateProp;
 };
 
 
 class CameraSheet : public PropSheet {
-    public:
-        CameraSheet();
-        ~CameraSheet();
-    
-        void handleEvent(Event *event);
-        void setCamera(Camera *camera);
-    
-        void updateOptionVisibility();
-    
-        NumberProp *exposureProp;
-    
-        BoolProp *orthoProp;
-        NumberProp *fovProp;
-        ComboProp *orthoSizeTypeProp;
-        NumberProp *orthoWidthProp;
-        NumberProp *orthoHeightProp;
-    
-        NumberProp *nearClipPlane;
-        NumberProp *farClipPlane;
-    
-        Camera *camera;
+	public:
+		CameraSheet();
+		~CameraSheet();
+	
+		void handleEvent(Event *event);
+		void setCamera(Camera *camera);
+	
+		void updateOptionVisibility();
+	
+		NumberProp *exposureProp;
+	
+		BoolProp *orthoProp;
+		NumberProp *fovProp;
+		ComboProp *orthoSizeTypeProp;
+		NumberProp *orthoWidthProp;
+		NumberProp *orthoHeightProp;
+	
+		NumberProp *nearClipPlane;
+		NumberProp *farClipPlane;
+	
+		Camera *camera;
 };
 
 
@@ -873,55 +875,55 @@ class SoundSheet : public PropSheet {
 		~SoundSheet();
 		
 		void handleEvent(Event *event);
-        void setSound(SceneSound *sound);
+		void setSound(SceneSound *sound);
 				
 		SceneSound *sound;
 
 		SoundProp *soundProp;		
 		NumberProp *referenceDistance;
-        BoolProp *loopOnLoad;
+		BoolProp *loopOnLoad;
 		NumberProp *maxDistance;
 		SliderProp *volume;
 		SliderProp *pitch;
 };
 
 class LayerSheet : public PropSheet {
-    public:
-        LayerSheet();
-        ~LayerSheet();
-        
-        void handleEvent(Event *event);
-        void setEntityInstance(SceneEntityInstance *instance);
-    
-        void setFromEntity();
-    
-        void Update();
+	public:
+		LayerSheet();
+		~LayerSheet();
+		
+		void handleEvent(Event *event);
+		void setEntityInstance(SceneEntityInstance *instance);
+	
+		void setFromEntity();
+	
+		void Update();
 
-    private:
-        ButtonProp *addLayerProp;
-        SceneEntityInstance *instance;
-        int layerRemoveIndex;
+	private:
+		ButtonProp *addLayerProp;
+		SceneEntityInstance *instance;
+		int layerRemoveIndex;
 };
 
 class LinkedMaterialsSheet : public PropSheet {
-    public:
-        LinkedMaterialsSheet();
-        ~LinkedMaterialsSheet();
-    
-        void handleEvent(Event *event);
-        void setEntityInstance(SceneEntityInstance *instance);
-    
-        void Update();
-    
-        void updateMaterials();
-    
-    
-    private:
-        SceneEntityInstance *instance;
-        ButtonProp *addMaterialProp;
-    
-        int poolRemoveIndex;
-    
+	public:
+		LinkedMaterialsSheet();
+		~LinkedMaterialsSheet();
+	
+		void handleEvent(Event *event);
+		void setEntityInstance(SceneEntityInstance *instance);
+	
+		void Update();
+	
+		void updateMaterials();
+	
+	
+	private:
+		SceneEntityInstance *instance;
+		ButtonProp *addMaterialProp;
+	
+		int poolRemoveIndex;
+	
 };
 
 class PropList : public UIElement {
@@ -931,8 +933,8 @@ class PropList : public UIElement {
 		
 		void updateProps();
 		void updateSize();
-    
-        void setCaption(const String &newCaption);
+	
+		void setCaption(const String &newCaption);
 		void addPropSheet(PropSheet *sheet);
 		void handleEvent(Event *event);
 		void Resize(Number width, Number height);
@@ -941,7 +943,7 @@ class PropList : public UIElement {
 	protected:
 	
 		UIElement *propContents;
-        UILabel *label;
+		UILabel *label;
 		std::vector<PropSheet*> props;	
 		UIRect *bg;
 		UIRect *bg2;				

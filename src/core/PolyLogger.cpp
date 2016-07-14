@@ -24,7 +24,10 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
-#include "polycode/core/PolyLogger.h"
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string>
@@ -46,14 +49,14 @@ LoggerEvent::~LoggerEvent() {
 
 Logger::Logger() : EventDispatcher() {
 	logToFile = false;
-    logFile = NULL;
+	logFile = NULL;
 }
 
 Logger::~Logger() {
-    if(logFile) {
-        fclose(logFile);
-    }
-    overrideInstance = NULL;
+	if(logFile) {
+		fclose(logFile);
+	}
+	overrideInstance = NULL;
 }
 
 void Logger::logBroadcast(String message) {
@@ -68,14 +71,18 @@ void Logger::logw(const char *str) {
 void Logger::log(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
+#ifndef __ANDROID__
 	vfprintf(stderr, format, args);
+#else
+	__android_log_vprint(ANDROID_LOG_INFO, "Polycode", format, args);
+#endif
 	va_end(args);
 	
 	if (Logger::getInstance()->getLogToFile()){
 		if (Logger::getInstance()->getLogFile()){
 			va_start(args, format);
 			vfprintf(Logger::getInstance()->getLogFile(), format, args);
-            fflush(Logger::getInstance()->getLogFile());
+			fflush(Logger::getInstance()->getLogFile());
 			va_end(args);
 		} else {
 			time_t t = time(NULL);
@@ -111,7 +118,7 @@ void Logger::log(const char *format, ...) {
 }
 
 void Logger::log(const String &message) {
-    log(message.c_str());
+	log(message.c_str());
 }
 
 void Logger::setLogToFile(bool val){

@@ -33,7 +33,7 @@
 
 using namespace Polycode;
 
-SceneLight::SceneLight(int type, Scene *parentScene, Number intensity, Number constantAttenuation, Number linearAttenuation, Number quadraticAttenuation) : Entity() {
+SceneLight::SceneLight(int type, Number intensity, Number constantAttenuation, Number linearAttenuation, Number quadraticAttenuation) : Entity() {
 	lightInfo.type = type;
 	lightInfo.intensity = intensity;
 	lightInfo.constantAttenuation = constantAttenuation;
@@ -43,26 +43,25 @@ SceneLight::SceneLight(int type, Scene *parentScene, Number intensity, Number co
 	lightInfo.spotlightCutoff = 40;
 	lightInfo.spotlightExponent = 10;
 		
-    shadowMapRes = 256;
+	shadowMapRes = 256;
 	this->depthWrite = false;
-    
-    shadowMapRenderBuffer = NULL;
-    
+	
+	shadowMapRenderBuffer = NULL;
+	
 	shadowMapFOV = 60.0f;
 	lightInfo.shadowMapTexture = NULL;
 	spotCamera = NULL;
-	this->parentScene = parentScene;
 	lightInfo.shadowsEnabled = false;
 	lightInfo.diffuseColor.setColor(1.0f,1.0f,1.0f,1.0f);
 	setSpotlightProperties(40,0.1);
 	
-    unlitMaterial = (Material*) Services()->getResourceManager()->getGlobalPool()->getResource(Resource::RESOURCE_MATERIAL, "Unlit");
-    
+	unlitMaterial = std::static_pointer_cast<Material>(Services()->getResourceManager()->getGlobalPool()->getResource(Resource::RESOURCE_MATERIAL, "Unlit"));
+	
 	lightInfo.importance = 0;
 }
 
 void SceneLight::setLightType(int lightType) {
-    lightInfo.type = lightType;
+	lightInfo.type = lightType;
 }
 
 void SceneLight::setLightImportance(int newImportance) {
@@ -76,26 +75,21 @@ int SceneLight::getLightImportance() const {
 void SceneLight::enableShadows(bool val, unsigned int resolution) {
 
 	if(val) {
-        if(shadowMapRenderBuffer) {
-            Services()->getRenderer()->destroyRenderBuffer(shadowMapRenderBuffer);
-        }
-        
-        shadowMapRenderBuffer = Services()->getRenderer()->createRenderBuffer(resolution, resolution, true, false);
-        
+		shadowMapRenderBuffer = nullptr;
+		shadowMapRenderBuffer = std::make_shared<RenderBuffer>(resolution, resolution, true, false);
+		
 		if(!spotCamera) {
-			spotCamera = new Camera(parentScene);
-            spotCamera->editorOnly = true;
-            spotCamera->setClippingPlanes(0.01, 50.0);
+			spotCamera = new Camera();
+			spotCamera->editorOnly = true;
+			spotCamera->setClippingPlanes(0.01, 50.0);
 			addChild(spotCamera);	
 		}
-        
+		
 		shadowMapRes = resolution;
 		lightInfo.shadowsEnabled = true;
 	} else {
 		lightInfo.shadowsEnabled = false;
-        if(shadowMapRenderBuffer) {
-            Services()->getRenderer()->destroyRenderBuffer(shadowMapRenderBuffer);
-        }
+		shadowMapRenderBuffer = nullptr;
 	}
 }
 
@@ -119,114 +113,94 @@ void SceneLight::setShadowMapFOV(Number fov) {
 }
 
 Number SceneLight::getShadowMapFOV() const {
-    return shadowMapFOV;
+	return shadowMapFOV;
 }
 
 SceneLight::~SceneLight() {
-    
-    if(shadowMapRenderBuffer) {
-        Services()->getRenderer()->destroyRenderBuffer(shadowMapRenderBuffer);
-    }
-    
-    if(!ownsChildren) {
-        delete spotCamera;
-    }
-    
-    if(parentScene) {
-        parentScene->removeLight(this);
-    }
+	if(!ownsChildren) {
+		delete spotCamera;
+	}
 }
 
 unsigned int SceneLight::getShadowMapResolution() const {
-    return shadowMapRes;
+	return shadowMapRes;
 }
 
-void SceneLight::renderDepthMap(Scene *scene) {
-    if(!unlitMaterial) {
-        return;
-    }
-    spotCamera->setFOV(shadowMapFOV);
-    spotCamera->setViewport(Polycode::Rectangle(0, 0, shadowMapRes, shadowMapRes));
-    scene->Render(spotCamera, shadowMapRenderBuffer, unlitMaterial, false);
-    
-    Matrix4 matTexAdj(0.5f,	0.0f,	0.0f,	0.0f,
-                      0.0f,	0.5f,	0.0f,	0.0f,
-                      0.0f,	0.0f,	0.5f,	0.0f,
-                      0.5f,	0.5f,	0.5f,	1.0f);
-    
-    lightInfo.lightViewMatrix = getConcatenatedMatrix().Inverse() *  spotCamera->getProjectionMatrix() * matTexAdj;
-    lightInfo.shadowMapTexture = shadowMapRenderBuffer->depthTexture;
+void SceneLight::renderDepthMap(RenderFrame *frame, Scene *scene) {
+	if(!unlitMaterial) {
+		return;
+	}
+	spotCamera->setFOV(shadowMapFOV);
+	spotCamera->setViewport(Polycode::Rectangle(0, 0, shadowMapRes, shadowMapRes));
+	scene->Render(frame, spotCamera, shadowMapRenderBuffer, unlitMaterial, false);
+	
+	Matrix4 matTexAdj(0.5f, 0.0f,	0.0f,	0.0f,
+					  0.0f, 0.5f,	0.0f,	0.0f,
+					  0.0f, 0.0f,	0.5f,	0.0f,
+					  0.5f, 0.5f,	0.5f,	1.0f);
+	
+	lightInfo.lightViewMatrix = getConcatenatedMatrix().Inverse() *	 spotCamera->getProjectionMatrix() * matTexAdj;
+	lightInfo.shadowMapTexture = shadowMapRenderBuffer->depthTexture;
 }
 
 LightInfo SceneLight::getLightInfo() const {
-    return lightInfo;
+	return lightInfo;
 }
 
 Entity *SceneLight::Clone(bool deepClone, bool ignoreEditorOnly) const {
-    SceneLight *newLight = new SceneLight(lightInfo.type, NULL, lightInfo.intensity, lightInfo.constantAttenuation, lightInfo.linearAttenuation, lightInfo.quadraticAttenuation);
-    applyClone(newLight, deepClone, ignoreEditorOnly);
-    return newLight;
+	SceneLight *newLight = new SceneLight(lightInfo.type, lightInfo.intensity, lightInfo.constantAttenuation, lightInfo.linearAttenuation, lightInfo.quadraticAttenuation);
+	applyClone(newLight, deepClone, ignoreEditorOnly);
+	return newLight;
 }
 
 void SceneLight::applyClone(Entity *clone, bool deepClone, bool ignoreEditorOnly) const {
-    Entity::applyClone(clone, deepClone, ignoreEditorOnly);
-    SceneLight *cloneLight = (SceneLight*) clone;
-    
-    cloneLight->setAttenuation(lightInfo.constantAttenuation, lightInfo.linearAttenuation, lightInfo.quadraticAttenuation);
-    cloneLight->setIntensity(lightInfo.intensity);
-    cloneLight->setDiffuseLightColor(lightInfo.diffuseColor.r, lightInfo.diffuseColor.g, lightInfo.diffuseColor.b);
-    cloneLight->setSpecularLightColor(lightInfo.specularColor.r, lightInfo.specularColor.g, lightInfo.specularColor.b, lightInfo.specularColor.a);
-    cloneLight->enableShadows(lightInfo.shadowsEnabled, shadowMapRes);
-    cloneLight->setShadowMapFOV(shadowMapFOV);
-    cloneLight->setSpotlightProperties(lightInfo.spotlightCutoff, lightInfo.spotlightExponent);
-    cloneLight->setLightType(lightInfo.type);
+	Entity::applyClone(clone, deepClone, ignoreEditorOnly);
+	SceneLight *cloneLight = (SceneLight*) clone;
+	
+	cloneLight->setAttenuation(lightInfo.constantAttenuation, lightInfo.linearAttenuation, lightInfo.quadraticAttenuation);
+	cloneLight->setIntensity(lightInfo.intensity);
+	cloneLight->setDiffuseLightColor(lightInfo.diffuseColor.r, lightInfo.diffuseColor.g, lightInfo.diffuseColor.b);
+	cloneLight->setSpecularLightColor(lightInfo.specularColor.r, lightInfo.specularColor.g, lightInfo.specularColor.b, lightInfo.specularColor.a);
+	cloneLight->enableShadows(lightInfo.shadowsEnabled, shadowMapRes);
+	cloneLight->setShadowMapFOV(shadowMapFOV);
+	cloneLight->setSpotlightProperties(lightInfo.spotlightCutoff, lightInfo.spotlightExponent);
+	cloneLight->setLightType(lightInfo.type);
 }
 
 Number SceneLight::getConstantAttenuation() const {
-    return lightInfo.constantAttenuation;
+	return lightInfo.constantAttenuation;
 }
 
 Number SceneLight::getLinearAttenuation() const {
-    return lightInfo.linearAttenuation;
+	return lightInfo.linearAttenuation;
 }
 
 Number SceneLight::getQuadraticAttenuation() const {
-    return lightInfo.quadraticAttenuation;
+	return lightInfo.quadraticAttenuation;
 }
 
 void SceneLight::setSpotlightProperties(Number spotlightCutoff, Number spotlightExponent) {
-    lightInfo.spotlightCutoff = spotlightCutoff;
-    lightInfo.spotlightExponent = spotlightExponent;
+	lightInfo.spotlightCutoff = spotlightCutoff;
+	lightInfo.spotlightExponent = spotlightExponent;
 }
 
 Number SceneLight::getSpotlightCutoff() const {
-    return lightInfo.spotlightCutoff;
+	return lightInfo.spotlightCutoff;
 }
 
 Number SceneLight::getSpotlightExponent() const{
-    return lightInfo.spotlightExponent;
-}
-
-Scene *SceneLight::getParentScene() const {
-    return parentScene;
+	return lightInfo.spotlightExponent;
 }
 
 int SceneLight::getLightType() const {
-    return lightInfo.type;
-}
-
-void SceneLight::setParentScene(Scene *scene) {
-    parentScene = scene;
-    if(spotCamera) {
-        spotCamera->setParentScene(scene);
-    }
+	return lightInfo.type;
 }
 
 Camera *SceneLight::getSpotlightCamera() {
-    return spotCamera;
+	return spotCamera;
 }
 
-Texture *SceneLight::getZBufferTexture() const {
+std::shared_ptr<Texture> SceneLight::getZBufferTexture() const {
 	return lightInfo.shadowMapTexture;
 }
 

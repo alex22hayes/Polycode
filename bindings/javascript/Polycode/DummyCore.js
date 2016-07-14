@@ -1,5 +1,14 @@
+require('Polycode/Core')
+
 function DummyCore() {
+	if(arguments[0] != "__skip_ptr__") {
+		this.__ptr = Polycode.DummyCore()
+	}
 }
+
+
+DummyCore.prototype = Object.create(Core.prototype)
+
 Duktape.fin(DummyCore.prototype, function (x) {
 	if (x === DummyCore.prototype) {
 		return;
@@ -7,26 +16,12 @@ Duktape.fin(DummyCore.prototype, function (x) {
 	Polycode.DummyCore__delete(x.__ptr)
 })
 
-DummyCore.prototype.Render = function() {
-	Polycode.DummyCore_Render(this.__ptr)
-}
-
 DummyCore.prototype.systemUpdate = function() {
 	return Polycode.DummyCore_systemUpdate(this.__ptr)
 }
 
 DummyCore.prototype.setCursor = function(cursorType) {
 	Polycode.DummyCore_setCursor(this.__ptr, cursorType)
-}
-
-DummyCore.prototype.createThread = function(target) {
-	Polycode.DummyCore_createThread(this.__ptr, target)
-}
-
-DummyCore.prototype.createMutex = function() {
-	var retVal = new CoreMutex()
-	retVal.__ptr = Polycode.DummyCore_createMutex(this.__ptr)
-	return retVal
 }
 
 DummyCore.prototype.copyStringToClipboard = function(str) {
@@ -42,11 +37,11 @@ DummyCore.prototype.createFolder = function(folderPath) {
 }
 
 DummyCore.prototype.copyDiskItem = function(itemPath,destItemPath) {
-	Polycode.DummyCore_copyDiskItem(this.__ptr, itemPath,destItemPath)
+	Polycode.DummyCore_copyDiskItem(this.__ptr, itemPath, destItemPath)
 }
 
 DummyCore.prototype.moveDiskItem = function(itemPath,destItemPath) {
-	Polycode.DummyCore_moveDiskItem(this.__ptr, itemPath,destItemPath)
+	Polycode.DummyCore_moveDiskItem(this.__ptr, itemPath, destItemPath)
 }
 
 DummyCore.prototype.removeDiskItem = function(itemPath) {
@@ -58,15 +53,11 @@ DummyCore.prototype.openFolderPicker = function() {
 }
 
 DummyCore.prototype.openFilePicker = function(extensions,allowMultiple) {
-	Polycode.DummyCore_openFilePicker(this.__ptr, extensions,allowMultiple)
+	Polycode.DummyCore_openFilePicker(this.__ptr, extensions, allowMultiple)
 }
 
 DummyCore.prototype.saveFilePicker = function(extensions) {
 	return Polycode.DummyCore_saveFilePicker(this.__ptr, extensions)
-}
-
-DummyCore.prototype.handleVideoModeChange = function(modeInfo) {
-	Polycode.DummyCore_handleVideoModeChange(this.__ptr, modeInfo)
 }
 
 DummyCore.prototype.flushRenderContext = function() {
@@ -82,9 +73,9 @@ DummyCore.prototype.getTicks = function() {
 }
 
 DummyCore.prototype.executeExternalCommand = function(command,args,inDirectory) {
-	return Polycode.DummyCore_executeExternalCommand(this.__ptr, command,args,inDirectory)
+	return Polycode.DummyCore_executeExternalCommand(this.__ptr, command, args, inDirectory)
 }
 
 DummyCore.prototype.systemParseFolder = function(pathString,showHidden,targetVector) {
-	return Polycode.DummyCore_systemParseFolder(this.__ptr, pathString,showHidden,targetVector)
+	return Polycode.DummyCore_systemParseFolder(this.__ptr, pathString, showHidden, targetVector)
 }
