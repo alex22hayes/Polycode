@@ -33,7 +33,8 @@ THE SOFTWARE.
 #include "polycode/core/PolyThreaded.h"
 #include "polycode/core/PolyGPUDrawBuffer.h"
 #include <stack>
-#include <queue>  
+#include <queue> 
+#include <mutex>
 
 #define RENDERER_MAX_LIGHTS 8
 #define RENDERER_MAX_LIGHT_SHADOWS 2
@@ -129,6 +130,10 @@ namespace Polycode {
 		
 		std::queue<GPUDrawBuffer*> drawBuffers;
 		Polycode::Rectangle viewport;
+
+		void *customFrameFinalizerData;
+		void(*customFrameFinalizer)(void*);
+
 	};
 	
 	class _PolyExport RenderThread : public Threaded {
@@ -166,9 +171,9 @@ namespace Polycode {
 			static const int JOB_DESTROY_PROGRAM = 10;
 			static const int JOB_DESTROY_SUBMESH_BUFFER = 11;
 			static const int JOB_DESTROY_RENDER_BUFFER = 13;
-		
+
 		protected:
-		
+        
 			unsigned int frameStart;
 			RenderThreadDebugInfo lastFrameDebugInfo;
 			RenderThreadDebugInfo currentDebugFrameInfo;
@@ -176,8 +181,8 @@ namespace Polycode {
 			std::vector<RenderFrame*> framesToDelete;
 		
 			Core *core;
-			CoreMutex *jobQueueMutex;
-			CoreMutex *renderMutex;
+            std::mutex jobQueueMutex;
+			std::mutex renderMutex;
 		
 			std::queue<RendererThreadJob> jobQueue;
 			std::queue<RenderFrame*> frameQueue;
@@ -195,7 +200,7 @@ namespace Polycode {
 	class _PolyExport Renderer : public PolyBase {
 	public:
 		
-	Renderer(RenderThread *customThread=NULL);
+	Renderer(Core *core, RenderThread *customThread=NULL);
 	virtual ~Renderer();
 		void setGraphicsInterface(Core *core, GraphicsInterface *graphicsInterface);
 		
@@ -244,4 +249,5 @@ namespace Polycode {
 		RenderThread *renderThread;
 
 	};
+
 }
